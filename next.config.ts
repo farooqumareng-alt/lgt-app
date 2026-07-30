@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["leathergoodstexas.com", "www.leathergoodstexas.com"],
+    },
+  },
 };
 
 export default nextConfig;
