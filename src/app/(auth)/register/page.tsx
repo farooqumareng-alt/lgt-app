@@ -14,7 +14,7 @@ export default function RegisterPage() {
       <div className="space-y-6">
         <div className="space-y-1 text-center">
           <h1 className="font-display text-2xl">Create your account</h1>
-          <p className="text-sm text-ink/60">Join LGT to track orders and save your details</p>
+          <p className="text-sm text-ink/60">Join Leather Goods Texas to track orders and save your details</p>
         </div>
         <RegisterForm />
         <p className="text-center text-sm text-ink/70">

@@ -16,9 +16,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.AUTH_URL ?? "http://localhost:3000"),
   title: {
-    default: "LGT — Genuine Leather Goods",
-    template: "%s | LGT",
+    default: "Leather Goods Texas",
+    template: "%s | Leather Goods Texas",
   },
   description:
     "Genuine leather belts, wallets, keychains, purses, handbags, and custom logo-embossed leather goods — retail and wholesale.",

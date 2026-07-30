@@ -14,7 +14,7 @@ export default function LoginPage() {
       <div className="space-y-6">
         <div className="space-y-1 text-center">
           <h1 className="font-display text-2xl">Welcome back</h1>
-          <p className="text-sm text-ink/60">Sign in to your LGT account</p>
+          <p className="text-sm text-ink/60">Sign in to your Leather Goods Texas account</p>
         </div>
         <LoginForm />
         <p className="text-center text-sm text-ink/70">

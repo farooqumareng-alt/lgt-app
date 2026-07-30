@@ -1,4 +1,4 @@
-const SITE_NAME = "LGT — Genuine Leather Goods";
+const SITE_NAME = "Leather Goods Texas";
 const SITE_URL = process.env.AUTH_URL ?? "http://localhost:3000";
 
 export function JsonLd({ data }: { data: Record<string, unknown> }) {

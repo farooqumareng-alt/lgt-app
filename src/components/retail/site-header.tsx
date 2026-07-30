@@ -10,8 +10,8 @@ export async function SiteHeader() {
   return (
     <header className="border-b border-cream-200">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <Link href="/" className="font-display text-2xl tracking-wide">
-          LGT
+        <Link href="/" className="whitespace-nowrap font-display text-xl tracking-wide sm:text-2xl">
+          Leather Goods Texas
         </Link>
 
         <nav className="hidden gap-8 text-sm font-medium sm:flex">

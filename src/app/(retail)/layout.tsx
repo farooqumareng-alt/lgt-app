@@ -6,7 +6,7 @@ export default function RetailLayout({ children }: { children: React.ReactNode }
       <SiteHeader />
       <main className="flex-1">{children}</main>
       <footer className="border-t border-cream-200 px-6 py-10 text-center text-sm text-ink/60">
-        © {new Date().getFullYear()} LGT — Genuine Leather Goods
+        © {new Date().getFullYear()} Leather Goods Texas
       </footer>
     </div>
   );
