@@ -3,9 +3,11 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { logout } from "@/server/actions/auth";
 import { Button } from "@/components/ui/button";
+import { getCart } from "@/server/repositories/cart";
 
 export async function SiteHeader() {
-  const session = await auth();
+  const [session, cart] = await Promise.all([auth(), getCart()]);
+  const itemCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 
   return (
     <header className="border-b border-cream-200">
@@ -27,6 +29,26 @@ export async function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <Link href="/cart" className="relative flex items-center p-2 hover:text-saddle" aria-label="Cart">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+              className="h-5 w-5"
+              aria-hidden="true"
+            >
+              <path d="M6 6h15l-1.5 9h-12z" strokeLinejoin="round" />
+              <path d="M6 6 5 3H2" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="9" cy="20" r="1.25" />
+              <circle cx="18" cy="20" r="1.25" />
+            </svg>
+            {itemCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-saddle px-1 text-[10px] font-medium text-cream-50">
+                {itemCount}
+              </span>
+            )}
+          </Link>
           {session?.user ? (
             <form action={logout}>
               <Button type="submit" variant="secondary">

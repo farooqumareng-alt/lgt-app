@@ -28,6 +28,8 @@ model User {
 
   accounts Account[]
   sessions Session[]
+  cart     Cart?
+  orders   Order[]
 
   @@index([role])
 }
@@ -141,5 +143,105 @@ model ProductVariant {
   stockQuantity       Int      @default(0)
   isActive            Boolean  @default(true)
 
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+
   @@index([productId])
+}
+
+// ── Cart & Checkout ───────────────────────────────────
+
+model Cart {
+  id         String   @id @default(cuid())
+  userId     String?  @unique
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guestToken String?  @unique
+  updatedAt  DateTime @updatedAt
+
+  items CartItem[]
+}
+
+model CartItem {
+  id               String         @id @default(cuid())
+  cartId           String
+  cart             Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productVariantId String
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id])
+  quantity         Int
+  createdAt        DateTime       @default(now())
+
+  @@unique([cartId, productVariantId])
+  @@index([cartId])
+}
+
+enum OrderStatus {
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderSequence Int         @default(autoincrement())
+  orderNumber   String      @unique
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id])
+  guestEmail    String?
+  status        OrderStatus @default(PAID)
+
+  subtotal      Decimal @db.Decimal(10, 2)
+  shippingTotal Decimal @db.Decimal(10, 2)
+  taxTotal      Decimal @db.Decimal(10, 2)
+  grandTotal    Decimal @db.Decimal(10, 2)
+  currency      String  @default("USD")
+
+  shippingAddress Json
+
+  stripeCheckoutSessionId String  @unique
+  stripePaymentIntentId   String?
+
+  shippingCarrier String?
+  trackingNumber  String?
+  trackingUrl     String?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+
+  items         OrderItem[]
+  statusHistory OrderStatusEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id                   String         @id @default(cuid())
+  orderId              String
+  order                Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productVariantId     String
+  productVariant       ProductVariant @relation(fields: [productVariantId], references: [id])
+  productNameSnapshot  String
+  variantLabelSnapshot String?
+  skuSnapshot          String
+  quantity             Int
+  unitPrice            Decimal        @db.Decimal(10, 2)
+  lineTotal            Decimal        @db.Decimal(10, 2)
+
+  @@index([orderId])
+}
+
+model OrderStatusEvent {
+  id        String      @id @default(cuid())
+  orderId   String
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    OrderStatus
+  note      String?
+  createdAt DateTime    @default(now())
+
+  @@index([orderId])
 }

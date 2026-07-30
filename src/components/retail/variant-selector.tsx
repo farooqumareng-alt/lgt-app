@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useMemo, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
+import { addToCart } from "@/server/actions/cart";
 import { cn } from "@/lib/utils";
 
 type Variant = {
@@ -39,6 +41,24 @@ export function VariantSelector({
 
   const price = selected?.priceRetailOverride ?? basePrice;
   const inStock = (selected?.stockQuantity ?? 0) > 0;
+
+  const [isPending, startTransition] = useTransition();
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(
+    null,
+  );
+
+  function handleAddToCart() {
+    if (!selected) return;
+    setFeedback(null);
+    startTransition(async () => {
+      const result = await addToCart(selected.id, 1);
+      setFeedback(
+        result.success
+          ? { type: "success", message: "Added to cart." }
+          : { type: "error", message: result.error },
+      );
+    });
+  }
 
   return (
     <div className="space-y-6">
@@ -91,12 +111,24 @@ export function VariantSelector({
       )}
 
       <div className="space-y-2">
-        <Button disabled className="w-full sm:w-auto">
-          {inStock ? "Add to Cart" : "Out of Stock"}
+        <Button
+          type="button"
+          disabled={!inStock || isPending}
+          onClick={handleAddToCart}
+          className="w-full sm:w-auto"
+        >
+          {!inStock ? "Out of Stock" : isPending ? "Adding…" : "Add to Cart"}
         </Button>
-        <p className="text-sm text-ink/60">
-          Online ordering is launching soon — check back shortly.
-        </p>
+        {feedback && (
+          <p className={cn("text-sm", feedback.type === "error" ? "text-saddle-700" : "text-ink/70")}>
+            {feedback.message}{" "}
+            {feedback.type === "success" && (
+              <Link href="/cart" className="underline">
+                View cart
+              </Link>
+            )}
+          </p>
+        )}
       </div>
     </div>
   );
