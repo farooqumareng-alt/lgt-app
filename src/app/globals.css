@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+/* Brand palette — exactly two colors (cream, saddle) plus ink for text.
+   Shades exist only for hover/active/border states, never as new hues. */
+@theme {
+  --color-cream-50: #fffdfa;
+  --color-cream: #f7f3ec;
+  --color-cream-200: #ece4d5;
+  --color-cream-300: #ddd1ba;
+
+  --color-saddle-50: #f3e8dd;
+  --color-saddle: #8b5a2b;
+  --color-saddle-600: #7a4e25;
+  --color-saddle-700: #69431f;
+
+  --color-ink: #2b2320;
+}
+
+@theme inline {
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+}
+
+@layer base {
+  ::selection {
+    background: var(--color-saddle);
+    color: var(--color-cream);
+  }
+
+  a {
+    color: var(--color-saddle);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-saddle);
+    outline-offset: 2px;
+  }
+}
