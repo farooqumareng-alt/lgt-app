@@ -66,3 +66,80 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
+// ── Catalog ───────────────────────────────────────────
+
+enum ProductCategorySlug {
+  BELTS
+  WALLETS
+  KEYCHAINS
+  PURSES
+  HANDBAGS
+}
+
+model Category {
+  id              String              @id @default(cuid())
+  slug            ProductCategorySlug @unique
+  urlSlug         String              @unique
+  name            String
+  description     String?             @db.Text
+  metaTitle       String?
+  metaDescription String?
+  sortOrder       Int                 @default(0)
+
+  products Product[]
+}
+
+model Product {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  sku              String   @unique
+  categoryId       String
+  category         Category @relation(fields: [categoryId], references: [id])
+  name             String
+  shortDescription String?
+  description      String   @db.Text
+  isCustomizable   Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  isFeatured       Boolean  @default(false)
+  basePriceRetail  Decimal  @db.Decimal(10, 2)
+  materials        String[]
+  metaTitle        String?
+  metaDescription  String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  images   ProductImage[]
+  variants ProductVariant[]
+
+  @@index([categoryId])
+  @@index([isActive, isFeatured])
+  @@index([isActive, isCustomizable])
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  altText   String
+  sortOrder Int     @default(0)
+  isPrimary Boolean @default(false)
+
+  @@index([productId])
+}
+
+model ProductVariant {
+  id                  String   @id @default(cuid())
+  productId           String
+  product             Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku                 String   @unique
+  color               String?
+  size                String?
+  material            String?
+  priceRetailOverride Decimal? @db.Decimal(10, 2)
+  stockQuantity       Int      @default(0)
+  isActive            Boolean  @default(true)
+
+  @@index([productId])
+}
