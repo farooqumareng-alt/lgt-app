@@ -2,6 +2,12 @@ import type { MetadataRoute } from "next";
 
 import { prisma } from "@/lib/prisma";
 
+// Otherwise this route's DB queries run at build time (it's cached/static by
+// default) — a transient database hiccup during a Vercel build would then fail
+// the entire deployment, not just this route. Computing it per-request instead
+// trades a bit of caching for that resilience.
+export const dynamic = "force-dynamic";
+
 const SITE_URL = process.env.AUTH_URL ?? "http://localhost:3000";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
