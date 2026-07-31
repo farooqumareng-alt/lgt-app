@@ -11,7 +11,10 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default async function CheckoutPage() {
+type Props = { searchParams: Promise<{ error?: string }> };
+
+export default async function CheckoutPage({ searchParams }: Props) {
+  const { error } = await searchParams;
   const cart = await getCart();
   const items = cart?.items.map(cartItemDto) ?? [];
 
@@ -31,6 +34,12 @@ export default async function CheckoutPage() {
         ]}
       />
       <h1 className="mt-4 font-display text-3xl">Checkout</h1>
+
+      {error && (
+        <p className="mt-4 rounded-sm border border-saddle-700 bg-saddle-50 p-4 text-sm text-saddle-700">
+          {error}
+        </p>
+      )}
 
       <div className="mt-8 space-y-4 rounded-sm border border-cream-200 p-6">
         {items.map((item) => (

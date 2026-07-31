@@ -1,6 +1,6 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 import type Stripe from "stripe";
 
 import { auth } from "@/lib/auth";
@@ -69,24 +69,36 @@ export async function createCheckoutSession() {
     };
   });
 
-  const checkoutSession = await stripe.checkout.sessions.create({
-    mode: "payment",
-    line_items: lineItems,
-    shipping_address_collection: { allowed_countries: ["US"] },
-    shipping_options: SHIPPING_OPTIONS,
-    automatic_tax: { enabled: true },
-    customer_email: session?.user?.email ?? undefined,
-    success_url: `${SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${SITE_URL}/checkout`,
-    metadata: {
-      cartId: cart.id,
-      ...(session?.user?.id ? { userId: session.user.id } : {}),
-    },
-  });
+  try {
+    const checkoutSession = await stripe.checkout.sessions.create({
+      mode: "payment",
+      line_items: lineItems,
+      shipping_address_collection: { allowed_countries: ["US"] },
+      shipping_options: SHIPPING_OPTIONS,
+      automatic_tax: { enabled: true },
+      customer_email: session?.user?.email ?? undefined,
+      success_url: `${SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${SITE_URL}/checkout`,
+      metadata: {
+        cartId: cart.id,
+        ...(session?.user?.id ? { userId: session.user.id } : {}),
+      },
+    });
 
-  if (!checkoutSession.url) {
-    throw new Error("Stripe did not return a checkout URL.");
+    if (!checkoutSession.url) {
+      throw new Error("Stripe did not return a checkout URL.");
+    }
+
+    redirect(checkoutSession.url);
+  } catch (error) {
+    // redirect() above throws Next.js's own internal control-flow signal on
+    // success — let that propagate untouched. Only genuine errors fall through.
+    unstable_rethrow(error);
+    // TEMPORARY diagnostic — surfaces the real error instead of a generic 500,
+    // since we've exhausted every local repro path (identical code/data/key
+    // succeeds everywhere except this deployment). Revert once root-caused.
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("createCheckoutSession failed:", error);
+    redirect(`/checkout?error=${encodeURIComponent(message)}`);
   }
-
-  redirect(checkoutSession.url);
 }
