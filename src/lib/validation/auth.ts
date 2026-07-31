@@ -2,7 +2,7 @@ import { z } from "zod";
 
 // Normalize before validating format — email lookups/uniqueness are case-insensitive
 // in practice, so two accounts that only differ by letter case must not be possible.
-const EmailField = z
+export const EmailField = z
   .string()
   .trim()
   .toLowerCase()

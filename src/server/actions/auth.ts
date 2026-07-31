@@ -54,7 +54,17 @@ export async function register(_prevState: FormState, formData: FormData): Promi
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  await prisma.user.create({ data: { name, email, passwordHash } });
+  const user = await prisma.user.create({ data: { name, email, passwordHash } });
+
+  // Link any past guest orders placed with this email — registration only, never
+  // re-checked on login. Known trade-off: without email verification (not yet
+  // implemented), this grants a new account access to that email's guest order
+  // history even if the registrant doesn't actually own the address. Accepted
+  // deliberately; revisit once an email provider/verification flow exists.
+  await prisma.order.updateMany({
+    where: { userId: null, guestEmail: email },
+    data: { userId: user.id, guestEmail: null },
+  });
 
   try {
     await signIn("credentials", { email, password, redirectTo: "/account" });
