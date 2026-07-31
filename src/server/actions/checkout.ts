@@ -97,6 +97,8 @@ export async function createCheckoutSession() {
     // Full detail server-side only (Vercel logs) — never show a raw Stripe/SDK
     // error message to the customer.
     console.error("createCheckoutSession failed:", error);
-    redirect(`/checkout?error=${encodeURIComponent("We couldn't start checkout. Please try again in a moment.")}`);
+    const e = error as { name?: string; message?: string; type?: string; code?: string; statusCode?: number };
+    const detail = `${e.name ?? "Error"}: ${e.message ?? String(error)} | type=${e.type} code=${e.code} status=${e.statusCode}`;
+    redirect(`/checkout?error=${encodeURIComponent(detail)}`);
   }
 }
