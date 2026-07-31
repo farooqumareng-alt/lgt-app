@@ -94,11 +94,9 @@ export async function createCheckoutSession() {
     // redirect() above throws Next.js's own internal control-flow signal on
     // success — let that propagate untouched. Only genuine errors fall through.
     unstable_rethrow(error);
-    // TEMPORARY diagnostic — surfaces the real error instead of a generic 500,
-    // since we've exhausted every local repro path (identical code/data/key
-    // succeeds everywhere except this deployment). Revert once root-caused.
-    const message = error instanceof Error ? error.message : String(error);
+    // Full detail server-side only (Vercel logs) — never show a raw Stripe/SDK
+    // error message to the customer.
     console.error("createCheckoutSession failed:", error);
-    redirect(`/checkout?error=${encodeURIComponent(message)}`);
+    redirect(`/checkout?error=${encodeURIComponent("We couldn't start checkout. Please try again in a moment.")}`);
   }
 }
