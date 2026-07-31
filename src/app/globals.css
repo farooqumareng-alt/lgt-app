@@ -1,17 +1,21 @@
 @import "tailwindcss";
 
-/* Brand palette — exactly two colors (cream, saddle) plus ink for text.
-   Shades exist only for hover/active/border states, never as new hues. */
+/* Brand palette — exactly two colors (cream, gold/bronze — still named "saddle"
+   in these token names to avoid a large rename) plus ink for text. Shades exist
+   only for hover/active/border states, never as new hues. The gold value is
+   sampled from the real logo (public/LGT.png) and darkened enough to clear
+   WCAG AA contrast against cream (the raw logo average, ~#b48142, only hit
+   3.08:1 — too light for text/button use). */
 @theme {
   --color-cream-50: #fffdfa;
   --color-cream: #f7f3ec;
   --color-cream-200: #ece4d5;
   --color-cream-300: #ddd1ba;
 
-  --color-saddle-50: #f3e8dd;
-  --color-saddle: #8b5a2b;
-  --color-saddle-600: #7a4e25;
-  --color-saddle-700: #69431f;
+  --color-saddle-50: #f7e3ca;
+  --color-saddle: #8f652f;
+  --color-saddle-600: #755227;
+  --color-saddle-700: #5e421f;
 
   --color-ink: #2b2320;
 }

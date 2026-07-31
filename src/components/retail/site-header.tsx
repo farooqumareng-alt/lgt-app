@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { auth } from "@/lib/auth";
@@ -11,9 +12,16 @@ export async function SiteHeader() {
 
   return (
     <header className="border-b border-cream-200">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <Link href="/" className="whitespace-nowrap font-display text-xl tracking-wide sm:text-2xl">
-          Leather Goods Texas
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+        <Link href="/" className="flex items-center py-1">
+          <Image
+            src="/logo.png"
+            alt="Leather Goods Texas"
+            width={769}
+            height={756}
+            className="h-16 w-auto sm:h-[4.5rem]"
+            priority
+          />
         </Link>
 
         <nav className="hidden gap-8 text-sm font-medium sm:flex">
