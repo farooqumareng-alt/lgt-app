@@ -37,7 +37,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
 
       {error && (
         <p className="mt-4 rounded-sm border border-saddle-700 bg-saddle-50 p-4 text-sm text-saddle-700">
-          {error}
+          Something went wrong starting checkout. Please try again.
         </p>
       )}
 
