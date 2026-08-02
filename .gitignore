@@ -45,3 +45,6 @@ next-env.d.ts
 
 # local Claude Code tool settings (may accumulate secrets in permission entries)
 /.claude
+
+# Fix Vise reference code (pasted in for evaluation, not part of lgt-app — never commit)
+/reference-fixvise
