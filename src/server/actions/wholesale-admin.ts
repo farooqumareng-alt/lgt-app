@@ -17,7 +17,13 @@ export async function approveWholesaleAccount(wholesaleAccountId: string) {
         reviewedBy: session.user.id,
       },
     });
-    await tx.user.update({ where: { id: account.userId }, data: { role: "WHOLESALER" } });
+    // Never downgrade an ADMIN — a user testing their own wholesale application
+    // (or any admin applying for legitimate business reasons) shouldn't lose
+    // elevated access just because their application got approved.
+    await tx.user.updateMany({
+      where: { id: account.userId, role: { not: "ADMIN" } },
+      data: { role: "WHOLESALER" },
+    });
   });
 
   revalidatePath("/admin/wholesale-applications");
