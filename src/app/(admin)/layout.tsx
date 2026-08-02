@@ -9,6 +9,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/admin/products" className="hover:text-saddle">
             Products
           </Link>
+          <Link href="/admin/orders" className="hover:text-saddle">
+            Orders
+          </Link>
+          <Link href="/admin/customers" className="hover:text-saddle">
+            Customers
+          </Link>
           <Link href="/admin/wholesale-applications" className="hover:text-saddle">
             Wholesale Applications
           </Link>
