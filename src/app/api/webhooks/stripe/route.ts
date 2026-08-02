@@ -4,6 +4,7 @@ import type Stripe from "stripe";
 
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
+import { resolveWholesaleUnitPrice } from "@/server/services/pricing-service";
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -23,6 +24,8 @@ export async function POST(request: Request) {
 
   if (event.type === "checkout.session.completed") {
     await handleCheckoutSessionCompleted(event.data.object);
+  } else if (event.type === "invoice.paid") {
+    await handleInvoicePaid(event.data.object);
   }
 
   return NextResponse.json({ received: true });
@@ -50,11 +53,34 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     return;
   }
 
+  const wholesaleAccountId = session.metadata?.wholesaleAccountId || null;
+
   const shippingAddress =
     session.collected_information?.shipping_details ?? session.customer_details ?? {};
 
   const paymentIntentId =
     typeof session.payment_intent === "string" ? session.payment_intent : (session.payment_intent?.id ?? null);
+
+  const itemsData = await Promise.all(
+    cart.items.map(async (item) => {
+      const variant = item.productVariant;
+      const product = variant.product;
+      const unitPrice = wholesaleAccountId
+        ? ((await resolveWholesaleUnitPrice(variant, item.quantity)) ?? 0)
+        : Number(variant.priceRetailOverride ?? product.basePriceRetail);
+      const variantLabel = [variant.color, variant.size].filter(Boolean).join(" / ") || null;
+
+      return {
+        productVariantId: variant.id,
+        productNameSnapshot: product.name,
+        variantLabelSnapshot: variantLabel,
+        skuSnapshot: variant.sku,
+        quantity: item.quantity,
+        unitPrice,
+        lineTotal: unitPrice * item.quantity,
+      };
+    }),
+  );
 
   await prisma.$transaction(async (tx) => {
     const order = await tx.order.create({
@@ -62,6 +88,9 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         orderNumber: session.id, // temporary unique placeholder, replaced below
         userId: session.metadata?.userId || null,
         guestEmail: session.metadata?.userId ? null : (session.customer_details?.email ?? null),
+        channel: wholesaleAccountId ? "WHOLESALE" : "RETAIL",
+        paymentMethod: "CARD",
+        wholesaleAccountId,
         subtotal: (session.amount_subtotal ?? 0) / 100,
         shippingTotal: (session.shipping_cost?.amount_total ?? 0) / 100,
         taxTotal: (session.total_details?.amount_tax ?? 0) / 100,
@@ -70,24 +99,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         shippingAddress,
         stripeCheckoutSessionId: session.id,
         stripePaymentIntentId: paymentIntentId,
-        items: {
-          create: cart.items.map((item) => {
-            const variant = item.productVariant;
-            const product = variant.product;
-            const unitPrice = Number(variant.priceRetailOverride ?? product.basePriceRetail);
-            const variantLabel = [variant.color, variant.size].filter(Boolean).join(" / ") || null;
-
-            return {
-              productVariantId: variant.id,
-              productNameSnapshot: product.name,
-              variantLabelSnapshot: variantLabel,
-              skuSnapshot: variant.sku,
-              quantity: item.quantity,
-              unitPrice,
-              lineTotal: unitPrice * item.quantity,
-            };
-          }),
-        },
+        items: { create: itemsData },
         statusHistory: {
           create: { status: "PAID", note: "Payment received via Stripe Checkout" },
         },
@@ -108,4 +120,23 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
 
     await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
   });
+}
+
+async function handleInvoicePaid(invoice: Stripe.Invoice) {
+  const order = await prisma.order.findUnique({ where: { stripeInvoiceId: invoice.id } });
+  if (!order) return; // not one of our wholesale invoice orders
+  if (order.status === "PAID") return; // already processed — safe no-op for a retried delivery
+
+  const grandTotal = (invoice.amount_paid ?? invoice.total ?? 0) / 100;
+  const taxTotal = (invoice.total_taxes ?? []).reduce((sum, t) => sum + t.amount, 0) / 100;
+
+  await prisma.$transaction([
+    prisma.order.update({
+      where: { id: order.id },
+      data: { status: "PAID", taxTotal, grandTotal },
+    }),
+    prisma.orderStatusEvent.create({
+      data: { orderId: order.id, status: "PAID", note: "Invoice paid" },
+    }),
+  ]);
 }

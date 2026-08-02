@@ -13,6 +13,13 @@ enum UserRole {
   ADMIN
 }
 
+enum WholesaleApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
 // Auth.js (NextAuth v5) Prisma Adapter schema — https://authjs.dev/getting-started/adapters/prisma
 
 model User {
@@ -26,13 +33,37 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts  Account[]
-  sessions  Session[]
-  cart      Cart?
-  orders    Order[]
-  addresses Address[]
+  accounts         Account[]
+  sessions         Session[]
+  carts            Cart[]
+  orders           Order[]
+  addresses        Address[]
+  wholesaleAccount WholesaleAccount?
 
   @@index([role])
+}
+
+model WholesaleAccount {
+  id                String                  @id @default(cuid())
+  userId            String                  @unique
+  user              User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessName      String
+  taxId             String?
+  phone             String
+  applicationNote   String?                 @db.Text
+  approvalStatus    WholesaleApprovalStatus @default(PENDING)
+  netTermsDays      Int?
+  creditLimit       Decimal?                @db.Decimal(10, 2)
+  minimumOrderValue Decimal?                @db.Decimal(10, 2)
+  stripeCustomerId  String?                 @unique
+  reviewedAt        DateTime?
+  reviewedBy        String?
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+
+  orders Order[]
+
+  @@index([approvalStatus])
 }
 
 model Address {
@@ -126,18 +157,32 @@ model Product {
   isActive         Boolean  @default(true)
   isFeatured       Boolean  @default(false)
   basePriceRetail  Decimal  @db.Decimal(10, 2)
+  basePriceWholesale Decimal? @db.Decimal(10, 2)
   materials        String[]
   metaTitle        String?
   metaDescription  String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  images   ProductImage[]
-  variants ProductVariant[]
+  images      ProductImage[]
+  variants    ProductVariant[]
+  priceBreaks WholesalePriceBreak[]
 
   @@index([categoryId])
   @@index([isActive, isFeatured])
   @@index([isActive, isCustomizable])
+}
+
+model WholesalePriceBreak {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  minQuantity Int
+  price       Decimal  @db.Decimal(10, 2)
+  createdAt   DateTime @default(now())
+
+  @@unique([productId, minQuantity])
+  @@index([productId])
 }
 
 model ProductImage {
@@ -156,13 +201,14 @@ model ProductVariant {
   id                  String   @id @default(cuid())
   productId           String
   product             Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  sku                 String   @unique
-  color               String?
-  size                String?
-  material            String?
-  priceRetailOverride Decimal? @db.Decimal(10, 2)
-  stockQuantity       Int      @default(0)
-  isActive            Boolean  @default(true)
+  sku                    String   @unique
+  color                  String?
+  size                   String?
+  material               String?
+  priceRetailOverride    Decimal? @db.Decimal(10, 2)
+  priceWholesaleOverride Decimal? @db.Decimal(10, 2)
+  stockQuantity          Int      @default(0)
+  isActive               Boolean  @default(true)
 
   cartItems  CartItem[]
   orderItems OrderItem[]
@@ -172,14 +218,22 @@ model ProductVariant {
 
 // ── Cart & Checkout ───────────────────────────────────
 
+enum CartChannel {
+  RETAIL
+  WHOLESALE
+}
+
 model Cart {
-  id         String   @id @default(cuid())
-  userId     String?  @unique
-  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  guestToken String?  @unique
-  updatedAt  DateTime @updatedAt
+  id         String      @id @default(cuid())
+  userId     String?
+  user       User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel    CartChannel @default(RETAIL)
+  guestToken String?     @unique
+  updatedAt  DateTime    @updatedAt
 
   items CartItem[]
+
+  @@unique([userId, channel])
 }
 
 model CartItem {
@@ -196,6 +250,7 @@ model CartItem {
 }
 
 enum OrderStatus {
+  INVOICED
   PAID
   PROCESSING
   SHIPPED
@@ -204,14 +259,28 @@ enum OrderStatus {
   REFUNDED
 }
 
+enum OrderChannel {
+  RETAIL
+  WHOLESALE
+}
+
+enum OrderPaymentMethod {
+  CARD
+  INVOICE
+}
+
 model Order {
-  id            String      @id @default(cuid())
-  orderSequence Int         @default(autoincrement())
-  orderNumber   String      @unique
-  userId        String?
-  user          User?       @relation(fields: [userId], references: [id])
-  guestEmail    String?
-  status        OrderStatus @default(PAID)
+  id                 String              @id @default(cuid())
+  orderSequence      Int                 @default(autoincrement())
+  orderNumber        String              @unique
+  userId             String?
+  user               User?               @relation(fields: [userId], references: [id])
+  guestEmail         String?
+  status             OrderStatus         @default(PAID)
+  channel            OrderChannel        @default(RETAIL)
+  paymentMethod      OrderPaymentMethod  @default(CARD)
+  wholesaleAccountId String?
+  wholesaleAccount   WholesaleAccount?   @relation(fields: [wholesaleAccountId], references: [id])
 
   subtotal      Decimal @db.Decimal(10, 2)
   shippingTotal Decimal @db.Decimal(10, 2)
@@ -221,8 +290,9 @@ model Order {
 
   shippingAddress Json
 
-  stripeCheckoutSessionId String  @unique
+  stripeCheckoutSessionId String? @unique
   stripePaymentIntentId   String?
+  stripeInvoiceId         String? @unique
 
   shippingCarrier String?
   trackingNumber  String?
@@ -238,6 +308,7 @@ model Order {
 
   @@index([userId])
   @@index([status])
+  @@index([wholesaleAccountId])
 }
 
 model OrderItem {

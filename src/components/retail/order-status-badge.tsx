@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 
 const LABELS: Record<string, string> = {
+  INVOICED: "Invoiced — Awaiting Payment",
   PAID: "Paid",
   PROCESSING: "Processing",
   SHIPPED: "Shipped",

@@ -60,7 +60,7 @@ export async function getCart() {
 
   if (session?.user) {
     const userCart = await prisma.cart.findUnique({
-      where: { userId: session.user.id },
+      where: { userId_channel: { userId: session.user.id, channel: "RETAIL" } },
       include: cartInclude,
     });
     if (userCart && userCart.items.length > 0) return userCart;
@@ -79,7 +79,7 @@ async function claimGuestCart(userId: string, guestToken: string) {
   const guestCart = await prisma.cart.findUnique({ where: { guestToken }, include: { items: true } });
   if (!guestCart) return;
 
-  const userCart = await prisma.cart.findUnique({ where: { userId } });
+  const userCart = await prisma.cart.findUnique({ where: { userId_channel: { userId, channel: "RETAIL" } } });
 
   if (!userCart) {
     await prisma.cart.update({ where: { id: guestCart.id }, data: { userId, guestToken: null } });
@@ -115,9 +115,9 @@ export async function getOrCreateCart() {
       cookieStore.delete(GUEST_CART_COOKIE);
     }
     return prisma.cart.upsert({
-      where: { userId: session.user.id },
+      where: { userId_channel: { userId: session.user.id, channel: "RETAIL" } },
       update: {},
-      create: { userId: session.user.id },
+      create: { userId: session.user.id, channel: "RETAIL" },
       include: cartInclude,
     });
   }

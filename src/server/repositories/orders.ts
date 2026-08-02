@@ -1,10 +1,11 @@
 import "server-only";
 
+import type { OrderChannel } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 
-export function getOrdersForUser(userId: string) {
+export function getOrdersForUser(userId: string, channel?: OrderChannel) {
   return prisma.order.findMany({
-    where: { userId },
+    where: { userId, ...(channel ? { channel } : {}) },
     orderBy: { createdAt: "desc" },
     include: { items: true },
   });
