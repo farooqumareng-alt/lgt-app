@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
       allowedOrigins: ["leathergoodstexas.com", "www.leathergoodstexas.com"],
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
