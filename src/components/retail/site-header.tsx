@@ -40,6 +40,11 @@ export async function SiteHeader({ channel = "RETAIL" }: { channel?: "RETAIL" | 
           <Link href="/wholesale" className="hover:text-saddle">
             Wholesale
           </Link>
+          {session?.user?.role === "ADMIN" && (
+            <Link href="/admin/wholesale-applications" className="hover:text-saddle">
+              Admin
+            </Link>
+          )}
         </nav>
 
         <div className="flex items-center gap-3">

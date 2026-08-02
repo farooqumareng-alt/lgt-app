@@ -67,6 +67,14 @@ export default async function AccountDashboardPage() {
             <p className="text-sm text-ink/60">Update your name, email, and password</p>
           </Card>
         </Link>
+        {session.user.role === "ADMIN" && (
+          <Link href="/admin/wholesale-applications">
+            <Card className="p-5 hover:border-saddle sm:col-span-2">
+              <p className="font-medium">Admin — Wholesale Applications</p>
+              <p className="text-sm text-ink/60">Review and approve pending wholesale accounts</p>
+            </Card>
+          </Link>
+        )}
       </div>
     </div>
   );
