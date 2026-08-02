@@ -5,10 +5,16 @@ import { auth } from "@/lib/auth";
 import { logout } from "@/server/actions/auth";
 import { Button } from "@/components/ui/button";
 import { getCart } from "@/server/repositories/cart";
+import { getWholesaleCartItemCount } from "@/server/repositories/wholesale-cart";
 
-export async function SiteHeader() {
-  const [session, cart] = await Promise.all([auth(), getCart()]);
-  const itemCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
+export async function SiteHeader({ channel = "RETAIL" }: { channel?: "RETAIL" | "WHOLESALE" }) {
+  const cartHref = channel === "WHOLESALE" ? "/wholesale/cart" : "/cart";
+  const [session, itemCount] = await Promise.all([
+    auth(),
+    channel === "WHOLESALE"
+      ? getWholesaleCartItemCount()
+      : getCart().then((cart) => cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0),
+  ]);
 
   return (
     <header className="border-b border-cream-200">
@@ -37,7 +43,7 @@ export async function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link href="/cart" className="relative flex items-center p-2 hover:text-saddle" aria-label="Cart">
+          <Link href={cartHref} className="relative flex items-center p-2 hover:text-saddle" aria-label="Cart">
             <svg
               viewBox="0 0 24 24"
               fill="none"

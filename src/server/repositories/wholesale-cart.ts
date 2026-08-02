@@ -1,5 +1,6 @@
 import "server-only";
 
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { requireApprovedWholesaler } from "@/lib/dal";
 import { resolveWholesaleUnitPrice } from "@/server/services/pricing-service";
@@ -61,4 +62,19 @@ export async function getOrCreateWholesaleCart() {
     create: { userId: session.user.id, channel: "WHOLESALE" },
     include: cartInclude,
   });
+}
+
+/**
+ * Read-only, never redirects — safe to call from the header on public
+ * wholesale pages (landing/apply/pending) that unapproved visitors can see.
+ */
+export async function getWholesaleCartItemCount() {
+  const session = await auth();
+  if (!session?.user) return 0;
+
+  const cart = await prisma.cart.findUnique({
+    where: { userId_channel: { userId: session.user.id, channel: "WHOLESALE" } },
+    include: { items: { select: { quantity: true } } },
+  });
+  return cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 }
