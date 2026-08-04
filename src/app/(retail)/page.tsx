@@ -60,7 +60,7 @@ export default async function HomePage() {
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {categories.map((category) => (
               <Link key={category.id} href={`/shop/${category.urlSlug}`}>
-                <Card className="p-5 text-center transition-colors hover:border-saddle">
+                <Card interactive className="p-5 text-center">
                   <p className="font-medium">{category.name}</p>
                 </Card>
               </Link>

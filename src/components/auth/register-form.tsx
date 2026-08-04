@@ -53,7 +53,7 @@ export function RegisterForm() {
 
       {state?.message && <p className="text-sm text-ink/70">{state.message}</p>}
 
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button type="submit" loading={pending} className="w-full">
         {pending ? "Creating account…" : "Create account"}
       </Button>
     </form>

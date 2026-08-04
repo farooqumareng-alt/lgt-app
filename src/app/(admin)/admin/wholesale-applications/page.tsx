@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { requireRole } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Card } from "@/components/ui/card";
 import { approveWholesaleAccount, rejectWholesaleAccount } from "@/server/actions/wholesale-admin";
 
@@ -44,12 +44,12 @@ export default async function WholesaleApplicationsPage() {
               {account.approvalStatus === "PENDING" && (
                 <div className="flex shrink-0 gap-2">
                   <form action={approveWholesaleAccount.bind(null, account.id)}>
-                    <Button type="submit">Approve</Button>
+                    <SubmitButton pendingLabel="Approving…">Approve</SubmitButton>
                   </form>
                   <form action={rejectWholesaleAccount.bind(null, account.id)}>
-                    <Button type="submit" variant="secondary">
+                    <SubmitButton pendingLabel="Rejecting…" variant="secondary">
                       Reject
-                    </Button>
+                    </SubmitButton>
                   </form>
                 </div>
               )}

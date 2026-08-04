@@ -38,7 +38,7 @@ export default async function AccountDashboardPage() {
           <div className="mt-4 space-y-3">
             {recentOrders.map((order) => (
               <Link key={order.id} href={`/account/orders/${order.orderNumber}`}>
-                <Card className="flex items-center justify-between p-4 hover:border-saddle">
+                <Card interactive className="flex items-center justify-between p-4">
                   <div>
                     <p className="text-sm font-medium">{order.orderNumber}</p>
                     <p className="text-xs text-ink/60">
@@ -56,20 +56,20 @@ export default async function AccountDashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Link href="/account/addresses">
-          <Card className="p-5 hover:border-saddle">
+          <Card interactive className="p-5">
             <p className="font-medium">Addresses</p>
             <p className="text-sm text-ink/60">Manage your saved addresses</p>
           </Card>
         </Link>
         <Link href="/account/settings">
-          <Card className="p-5 hover:border-saddle">
+          <Card interactive className="p-5">
             <p className="font-medium">Settings</p>
             <p className="text-sm text-ink/60">Update your name, email, and password</p>
           </Card>
         </Link>
         {session.user.role === "ADMIN" && (
           <Link href="/admin/wholesale-applications">
-            <Card className="p-5 hover:border-saddle sm:col-span-2">
+            <Card interactive className="p-5 sm:col-span-2">
               <p className="font-medium">Admin — Wholesale Applications</p>
               <p className="text-sm text-ink/60">Review and approve pending wholesale accounts</p>
             </Card>

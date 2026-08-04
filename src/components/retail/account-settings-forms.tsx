@@ -36,7 +36,7 @@ export function ProfileForm({ name }: { name: string | null }) {
         {errors?.name && <p className="text-sm text-saddle-700">{errors.name[0]}</p>}
       </div>
       <StatusMessage state={state} />
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" loading={pending}>
         {pending ? "Saving…" : "Save Name"}
       </Button>
     </form>
@@ -57,7 +57,7 @@ export function EmailForm({ email }: { email: string }) {
         {errors?.email && <p className="text-sm text-saddle-700">{errors.email[0]}</p>}
       </div>
       <StatusMessage state={state} />
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" loading={pending}>
         {pending ? "Saving…" : "Save Email"}
       </Button>
     </form>
@@ -87,7 +87,7 @@ export function PasswordForm() {
         {errors?.newPassword && <p className="text-sm text-saddle-700">{errors.newPassword[0]}</p>}
       </div>
       <StatusMessage state={state} />
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" loading={pending}>
         {pending ? "Saving…" : "Change Password"}
       </Button>
     </form>

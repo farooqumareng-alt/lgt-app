@@ -33,7 +33,7 @@ export function AddVariantForm({ productId }: { productId: string }) {
         Active
       </label>
       <div className="col-span-2 sm:col-span-4">
-        <Button type="submit" variant="secondary" disabled={pending}>
+        <Button type="submit" variant="secondary" loading={pending}>
           {pending ? "Adding…" : "Add Variant"}
         </Button>
         {state && !state.success && state.message && (

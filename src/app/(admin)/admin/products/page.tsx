@@ -41,7 +41,7 @@ export default async function AdminProductsPage({ searchParams }: Props) {
         {products.length === 0 && <p className="text-ink/60">No products match.</p>}
         {products.map((product) => (
           <Link key={product.id} href={`/admin/products/${product.id}/edit`}>
-            <Card className="flex items-center justify-between p-4 hover:border-saddle">
+            <Card interactive className="flex items-center justify-between p-4">
               <div>
                 <p className="font-medium">
                   {product.name} <span className="text-ink/50">({product.sku})</span>

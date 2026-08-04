@@ -52,7 +52,7 @@ export function WholesaleApplicationForm() {
         <p className="text-sm text-saddle-700">{state.message}</p>
       )}
 
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" loading={pending}>
         {pending ? "Submitting…" : "Submit Application"}
       </Button>
     </form>

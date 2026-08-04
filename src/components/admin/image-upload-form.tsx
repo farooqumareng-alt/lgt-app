@@ -31,7 +31,7 @@ export function ImageUploadForm({ productId }: { productId: string }) {
         <label className="text-xs text-ink/60">Alt text (required)</label>
         <Input name="altText" placeholder="Describe the image" required />
       </div>
-      <Button type="submit" variant="secondary" disabled={pending}>
+      <Button type="submit" variant="secondary" loading={pending}>
         {pending ? "Uploading…" : "Upload Image"}
       </Button>
       {state && !state.success && state.message && (

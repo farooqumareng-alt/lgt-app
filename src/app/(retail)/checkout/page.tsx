@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/retail/breadcrumbs";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { cartItemDto, getCart } from "@/server/repositories/cart";
 import { createCheckoutSession } from "@/server/actions/checkout";
 
@@ -61,9 +61,9 @@ export default async function CheckoutPage({ searchParams }: Props) {
       </div>
 
       <form action={createCheckoutSession} className="mt-6">
-        <Button type="submit" className="w-full">
+        <SubmitButton pendingLabel="Redirecting to payment…" className="w-full">
           Continue to Payment
-        </Button>
+        </SubmitButton>
       </form>
     </div>
   );

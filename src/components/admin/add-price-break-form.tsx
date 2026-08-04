@@ -28,7 +28,7 @@ export function AddPriceBreakForm({ productId }: { productId: string }) {
         <Input name="price" type="number" step="0.01" min="0" placeholder="15.00" required />
         {errors?.price && <p className="text-xs text-saddle-700">{errors.price[0]}</p>}
       </div>
-      <Button type="submit" variant="secondary" disabled={pending}>
+      <Button type="submit" variant="secondary" loading={pending}>
         {pending ? "Adding…" : "Add Price Break"}
       </Button>
       {state && !state.success && state.message && (

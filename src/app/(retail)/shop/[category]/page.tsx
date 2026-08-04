@@ -62,7 +62,7 @@ export default async function CategoryPage({ params }: Props) {
       <div className="mt-6 flex flex-wrap gap-2">
         <Link
           href="/shop"
-          className="rounded-sm border border-cream-300 px-3 py-1.5 text-sm font-medium hover:border-saddle"
+          className="rounded-sm border border-cream-300 px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-saddle"
         >
           All
         </Link>
@@ -73,7 +73,7 @@ export default async function CategoryPage({ params }: Props) {
             className={
               c.id === category.id
                 ? "rounded-sm border border-saddle bg-saddle-50 px-3 py-1.5 text-sm font-medium"
-                : "rounded-sm border border-cream-300 px-3 py-1.5 text-sm font-medium hover:border-saddle"
+                : "rounded-sm border border-cream-300 px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-saddle"
             }
           >
             {c.name}

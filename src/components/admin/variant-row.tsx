@@ -68,7 +68,7 @@ function VariantEditForm({ variant, onDone }: { variant: Variant; onDone: () => 
         Active
       </label>
       <div className="col-span-2 flex gap-2 sm:col-span-4">
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" loading={pending}>
           {pending ? "Saving…" : "Save"}
         </Button>
         <button type="button" onClick={onDone} className="text-sm text-ink/50 underline">

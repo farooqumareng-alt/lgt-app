@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { requireApprovedWholesaler } from "@/lib/dal";
 import { cartItemDtos, getOrCreateWholesaleCart } from "@/server/repositories/wholesale-cart";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { createWholesaleCheckoutSession, createWholesaleInvoiceOrder } from "@/server/actions/wholesale-checkout";
 
 export const metadata: Metadata = {
@@ -56,15 +56,15 @@ export default async function WholesaleCheckoutPage({
 
       <div className="mt-6 flex flex-col gap-3">
         <form action={createWholesaleCheckoutSession}>
-          <Button type="submit" className="w-full">
+          <SubmitButton pendingLabel="Redirecting to payment…" className="w-full">
             Pay by Card
-          </Button>
+          </SubmitButton>
         </form>
         {wholesaleAccount.netTermsDays && (
           <form action={createWholesaleInvoiceOrder}>
-            <Button type="submit" variant="secondary" className="w-full">
+            <SubmitButton pendingLabel="Placing order…" variant="secondary" className="w-full">
               Place Order on Net {wholesaleAccount.netTermsDays} Terms
-            </Button>
+            </SubmitButton>
           </form>
         )}
       </div>

@@ -34,7 +34,7 @@ export default async function ShopPage() {
           <Link
             key={category.id}
             href={`/shop/${category.urlSlug}`}
-            className="rounded-sm border border-cream-300 px-3 py-1.5 text-sm font-medium hover:border-saddle"
+            className="rounded-sm border border-cream-300 px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-saddle"
           >
             {category.name}
           </Link>

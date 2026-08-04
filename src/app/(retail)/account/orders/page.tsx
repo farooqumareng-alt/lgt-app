@@ -27,7 +27,7 @@ export default async function OrdersPage() {
         <div className="mt-6 space-y-3">
           {orders.map((order) => (
             <Link key={order.id} href={`/account/orders/${order.orderNumber}`}>
-              <Card className="flex items-center justify-between p-4 hover:border-saddle">
+              <Card interactive className="flex items-center justify-between p-4">
                 <div>
                   <p className="text-sm font-medium">{order.orderNumber}</p>
                   <p className="text-xs text-ink/60">

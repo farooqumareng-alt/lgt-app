@@ -51,7 +51,7 @@ export function OrderTrackingForm({
           placeholder="Tracking number"
           className="max-w-xs"
         />
-        <Button type="button" onClick={submit} disabled={isPending} variant="secondary">
+        <Button type="button" onClick={submit} loading={isPending} variant="secondary">
           {isPending ? "Saving…" : "Save Tracking"}
         </Button>
       </div>

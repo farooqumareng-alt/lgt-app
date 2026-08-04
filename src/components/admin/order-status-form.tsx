@@ -46,7 +46,7 @@ export function OrderStatusForm({ orderId, currentStatus }: { orderId: string; c
           placeholder="Note (optional)"
           className="max-w-xs"
         />
-        <Button type="button" onClick={submit} disabled={isPending} variant="secondary">
+        <Button type="button" onClick={submit} loading={isPending} variant="secondary">
           {isPending ? "Updating…" : "Update Status"}
         </Button>
       </div>

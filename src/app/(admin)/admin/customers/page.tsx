@@ -37,7 +37,7 @@ export default async function AdminCustomersPage({ searchParams }: Props) {
         {customers.length === 0 && <p className="text-ink/60">No customers match.</p>}
         {customers.map((customer) => (
           <Link key={customer.id} href={`/admin/customers/${customer.id}`}>
-            <Card className="flex items-center justify-between p-4 hover:border-saddle">
+            <Card interactive className="flex items-center justify-between p-4">
               <div>
                 <p className="text-sm font-medium">{customer.name ?? "—"}</p>
                 <p className="text-xs text-ink/60">{customer.email}</p>

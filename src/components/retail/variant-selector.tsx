@@ -113,7 +113,8 @@ export function VariantSelector({
       <div className="space-y-2">
         <Button
           type="button"
-          disabled={!inStock || isPending}
+          disabled={!inStock}
+          loading={isPending}
           onClick={handleAddToCart}
           className="w-full sm:w-auto"
         >

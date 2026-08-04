@@ -101,7 +101,7 @@ export function BulkOrderGrid({ products }: { products: WholesaleProduct[] }) {
 
       {message && <p className="text-sm text-saddle-700">{message}</p>}
 
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" loading={isPending}>
         {isPending ? "Adding…" : "Add All to Cart"}
       </Button>
     </form>
