@@ -4,8 +4,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen bg-cream-50">
       <header className="flex items-center gap-6 border-b border-cream-200 px-6 py-4">
-        <span className="font-display text-xl">Admin</span>
+        <Link href="/admin" className="font-display text-xl hover:text-saddle">
+          Admin
+        </Link>
         <nav className="flex gap-4 text-sm font-medium">
+          <Link href="/admin" className="hover:text-saddle">
+            Dashboard
+          </Link>
           <Link href="/admin/products" className="hover:text-saddle">
             Products
           </Link>
