@@ -4,21 +4,32 @@ import type { ComponentProps } from "react";
 
 import { cn } from "@/lib/utils";
 
+// "Tooled Leather" — buttons read as stamped/embossed material rather than
+// floating UI chrome: a fine diagonal grain, a raised top highlight + a
+// deeper inset shadow along the bottom edge, and on press the emboss
+// inverts (like the surface compressing) instead of the button lifting.
+const LEATHER_GRAIN_LIGHT =
+  "bg-[image:repeating-linear-gradient(115deg,rgba(255,255,255,0.035)_0px,rgba(255,255,255,0.035)_1px,transparent_1px,transparent_3px)]";
+const LEATHER_GRAIN_DARK =
+  "bg-[image:repeating-linear-gradient(115deg,rgba(43,35,32,0.03)_0px,rgba(43,35,32,0.03)_1px,transparent_1px,transparent_3px)]";
+
 const buttonVariants = cva(
-  "relative inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-medium " +
-    "transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-[cubic-bezier(0.2,0.8,0.2,1)] " +
+  "relative inline-flex items-center justify-center gap-2 rounded-[3px] px-5 py-2.5 text-sm font-medium " +
+    "transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-out " +
     "disabled:pointer-events-none disabled:translate-y-0 disabled:opacity-50 disabled:shadow-none",
   {
     variants: {
       variant: {
         primary:
-          "bg-saddle text-cream-50 shadow-[0_1px_2px_rgba(0,0,0,0.12),0_8px_20px_-8px_rgba(143,101,47,0.55)] " +
-          "hover:-translate-y-0.5 hover:bg-saddle-600 hover:shadow-[0_2px_4px_rgba(0,0,0,0.14),0_14px_28px_-10px_rgba(143,101,47,0.65)] " +
-          "active:translate-y-0 active:bg-saddle-700 active:shadow-[0_1px_2px_rgba(0,0,0,0.16)]",
+          `border border-saddle-700 bg-saddle ${LEATHER_GRAIN_LIGHT} text-cream-50 ` +
+          "shadow-[inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-3px_6px_rgba(0,0,0,0.28),0_1px_2px_rgba(0,0,0,0.18)] " +
+          "hover:bg-saddle-600 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-4px_8px_rgba(0,0,0,0.32),0_2px_5px_rgba(0,0,0,0.22)] " +
+          "active:translate-y-px active:bg-saddle-700 active:shadow-[inset_0_2px_5px_rgba(0,0,0,0.4)]",
         secondary:
-          "border border-cream-300 bg-cream-50 text-ink shadow-[0_1px_2px_rgba(0,0,0,0.06)] " +
-          "hover:-translate-y-0.5 hover:border-saddle hover:text-saddle-700 " +
-          "active:translate-y-0",
+          `border border-saddle-300 bg-cream-50 ${LEATHER_GRAIN_DARK} text-ink ` +
+          "shadow-[inset_0_1px_2px_rgba(43,35,32,0.07)] " +
+          "hover:border-saddle hover:text-saddle-700 " +
+          "active:translate-y-px active:shadow-[inset_0_2px_4px_rgba(43,35,32,0.14)]",
         ghost: "text-ink hover:bg-cream-200 active:bg-cream-300",
       },
     },
