@@ -68,10 +68,10 @@ export default async function AccountDashboardPage() {
           </Card>
         </Link>
         {session.user.role === "ADMIN" && (
-          <Link href="/admin/wholesale-applications">
+          <Link href="/admin">
             <Card interactive className="p-5 sm:col-span-2">
-              <p className="font-medium">Admin — Wholesale Applications</p>
-              <p className="text-sm text-ink/60">Review and approve pending wholesale accounts</p>
+              <p className="font-medium">Admin Dashboard</p>
+              <p className="text-sm text-ink/60">Orders, products, customers, and pending approvals</p>
             </Card>
           </Link>
         )}

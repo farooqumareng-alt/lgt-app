@@ -24,13 +24,7 @@ export function ProductCard({
 }: ProductCardProps) {
   return (
     <Link href={`/shop/${categoryUrlSlug}/${slug}`} className="group block">
-      <Card
-        className={
-          "overflow-hidden transition-[transform,box-shadow,border-color] duration-150 " +
-          "ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:-translate-y-1 group-hover:border-saddle " +
-          "group-hover:shadow-[0_14px_28px_-14px_rgba(0,0,0,0.25)]"
-        }
-      >
+      <Card interactive stitched className="overflow-hidden">
         <div className="relative aspect-square overflow-hidden">
           {image ? (
             <Image

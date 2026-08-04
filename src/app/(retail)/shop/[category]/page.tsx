@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/retail/breadcrumbs";
 import { ProductCard } from "@/components/retail/product-card";
+import { FilterChip } from "@/components/ui/filter-chip";
 import { JsonLd, breadcrumbListJsonLd } from "@/lib/seo/json-ld";
 import {
   getActiveCategories,
@@ -60,24 +60,11 @@ export default async function CategoryPage({ params }: Props) {
       )}
 
       <div className="mt-6 flex flex-wrap gap-2">
-        <Link
-          href="/shop"
-          className="rounded-sm border border-cream-300 px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-saddle"
-        >
-          All
-        </Link>
+        <FilterChip href="/shop">All</FilterChip>
         {allCategories.map((c) => (
-          <Link
-            key={c.id}
-            href={`/shop/${c.urlSlug}`}
-            className={
-              c.id === category.id
-                ? "rounded-sm border border-saddle bg-saddle-50 px-3 py-1.5 text-sm font-medium"
-                : "rounded-sm border border-cream-300 px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-saddle"
-            }
-          >
+          <FilterChip key={c.id} href={`/shop/${c.urlSlug}`} active={c.id === category.id}>
             {c.name}
-          </Link>
+          </FilterChip>
         ))}
       </div>
 

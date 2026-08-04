@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { Breadcrumbs } from "@/components/retail/breadcrumbs";
 import { ProductCard } from "@/components/retail/product-card";
+import { FilterChip } from "@/components/ui/filter-chip";
 import { getActiveCategories, getActiveProducts } from "@/server/repositories/products";
 
 export const revalidate = 3600;
@@ -27,17 +27,13 @@ export default async function ShopPage() {
       <h1 className="mt-4 font-display text-3xl">Shop All</h1>
 
       <div className="mt-6 flex flex-wrap gap-2">
-        <span className="rounded-sm border border-saddle bg-saddle-50 px-3 py-1.5 text-sm font-medium">
+        <FilterChip href="/shop" active>
           All
-        </span>
+        </FilterChip>
         {categories.map((category) => (
-          <Link
-            key={category.id}
-            href={`/shop/${category.urlSlug}`}
-            className="rounded-sm border border-cream-300 px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-saddle"
-          >
+          <FilterChip key={category.id} href={`/shop/${category.urlSlug}`}>
             {category.name}
-          </Link>
+          </FilterChip>
         ))}
       </div>
 

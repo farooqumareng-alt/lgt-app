@@ -41,7 +41,7 @@ export async function SiteHeader({ channel = "RETAIL" }: { channel?: "RETAIL" | 
             Wholesale
           </Link>
           {session?.user?.role === "ADMIN" && (
-            <Link href="/admin/wholesale-applications" className="hover:text-saddle">
+            <Link href="/admin" className="hover:text-saddle">
               Admin
             </Link>
           )}
