@@ -45,5 +45,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ deletedUsers: deleted.count });
   }
 
+  // One fixed, idempotent statement — matches
+  // prisma/migrations/20260804205112_drop_verification_token_unique_index.
+  // Real bug: VerificationToken.token had a bare @unique in addition to the
+  // standard Auth.js @@unique([identifier, token]), so two different users
+  // issued the same random 6-digit code (identifier differs, code collides)
+  // would fail to insert with P2002 instead of just working.
+  if (action === "migrate-drop-token-unique") {
+    await prisma.$executeRawUnsafe('DROP INDEX IF EXISTS "VerificationToken_token_key";');
+    return NextResponse.json({ migrated: true });
+  }
+
   return NextResponse.json({ error: "Unknown action" }, { status: 400 });
 }

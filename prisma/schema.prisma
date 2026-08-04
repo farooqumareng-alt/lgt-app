@@ -115,7 +115,12 @@ model Session {
 
 model VerificationToken {
   identifier String
-  token      String   @unique
+  // No standalone @unique here — only the compound key below. A bare-unique
+  // token would mean two different users who happen to be issued the same
+  // random 6-digit OTP code (identifier differs, code collides) fail to
+  // insert with a unique-constraint violation instead of just working, since
+  // each user's token is only ever looked up by (identifier, token) together.
+  token      String
   expires    DateTime
 
   @@unique([identifier, token])
