@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import Link from "next/link";
+import { useActionState, useState } from "react";
 
 import { login } from "@/server/actions/auth";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { Input } from "@/components/ui/input";
 
 export function LoginForm() {
   const [state, formAction, pending] = useActionState(login, undefined);
+  const [email, setEmail] = useState("");
 
   return (
     <form action={formAction} className="space-y-4">
@@ -15,7 +17,15 @@ export function LoginForm() {
         <label htmlFor="email" className="text-sm font-medium">
           Email
         </label>
-        <Input id="email" name="email" type="email" autoComplete="email" required />
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
         {state?.errors?.email && (
           <p className="text-sm text-saddle-700">{state.errors.email[0]}</p>
         )}
@@ -37,9 +47,21 @@ export function LoginForm() {
         )}
       </div>
 
-      {state?.message && <p className="text-sm text-saddle-700">{state.message}</p>}
+      {state?.message && (
+        <p className="text-sm text-saddle-700">
+          {state.message}
+          {state.needsVerification && (
+            <>
+              {" "}
+              <Link href={`/verify-email?email=${encodeURIComponent(email)}`} className="underline">
+                Verify now
+              </Link>
+            </>
+          )}
+        </p>
+      )}
 
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button type="submit" loading={pending} className="w-full">
         {pending ? "Signing in…" : "Sign in"}
       </Button>
     </form>

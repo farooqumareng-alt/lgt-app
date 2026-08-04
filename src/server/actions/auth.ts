@@ -2,13 +2,16 @@
 
 import bcrypt from "bcryptjs";
 import { AuthError } from "next-auth";
+import { redirect } from "next/navigation";
 
 import { signIn, signOut } from "@/lib/auth";
+import { sendVerificationEmail } from "@/lib/email";
+import { checkResendCooldown, createVerificationToken, verifyOtpCode } from "@/lib/otp";
 import { prisma } from "@/lib/prisma";
 import { LoginSchema, RegisterSchema } from "@/lib/validation/auth";
 
 export type FormState =
-  | { errors?: Record<string, string[]>; message?: string }
+  | { errors?: Record<string, string[]>; message?: string; needsVerification?: boolean }
   | undefined;
 
 export async function login(_prevState: FormState, formData: FormData): Promise<FormState> {
@@ -19,6 +22,14 @@ export async function login(_prevState: FormState, formData: FormData): Promise<
 
   if (!parsed.success) {
     return { errors: parsed.error.flatten().fieldErrors };
+  }
+
+  const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+  if (user && user.passwordHash && !user.emailVerified) {
+    return {
+      message: "Please verify your email before signing in.",
+      needsVerification: true,
+    };
   }
 
   try {
@@ -54,26 +65,82 @@ export async function register(_prevState: FormState, formData: FormData): Promi
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = await prisma.user.create({ data: { name, email, passwordHash } });
+  await prisma.user.create({ data: { name, email, passwordHash } });
 
-  // Link any past guest orders placed with this email — registration only, never
-  // re-checked on login. Known trade-off: without email verification (not yet
-  // implemented), this grants a new account access to that email's guest order
-  // history even if the registrant doesn't actually own the address. Accepted
-  // deliberately; revisit once an email provider/verification flow exists.
+  // Guest-order linking now happens in verifyEmail(), only once the registrant
+  // has actually proven ownership of the address — see the plan doc for why this
+  // moved out of here.
+  const code = await createVerificationToken(email);
+  try {
+    await sendVerificationEmail(email, code);
+  } catch (error) {
+    // Never let an email-provider hiccup 500 the whole signup — the account and
+    // its token already exist, so "Resend code" on the next page still works
+    // once the underlying issue (bad key, provider outage) is fixed.
+    console.error("sendVerificationEmail failed during registration:", error);
+  }
+
+  redirect(`/verify-email?email=${encodeURIComponent(email)}`);
+}
+
+export type VerifyEmailState =
+  | { success: true }
+  | { success: false; message: string }
+  | undefined;
+
+export async function verifyEmail(
+  _prevState: VerifyEmailState,
+  formData: FormData,
+): Promise<VerifyEmailState> {
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
+  const code = String(formData.get("code") ?? "").trim();
+
+  if (!email || !code) {
+    return { success: false, message: "Enter the code sent to your email." };
+  }
+
+  const isValid = await verifyOtpCode(email, code);
+  if (!isValid) {
+    return { success: false, message: "That code is invalid or expired. Request a new one below." };
+  }
+
+  const user = await prisma.user.update({ where: { email }, data: { emailVerified: new Date() } });
+
+  // Now that email ownership is confirmed, link any guest orders placed with
+  // this address.
   await prisma.order.updateMany({
     where: { userId: null, guestEmail: email },
     data: { userId: user.id, guestEmail: null },
   });
 
-  try {
-    await signIn("credentials", { email, password, redirectTo: "/account" });
-  } catch (error) {
-    if (error instanceof AuthError) {
-      return { message: "Account created — please log in." };
-    }
-    throw error;
+  redirect("/login?verified=1");
+}
+
+export type ResendState = { message: string } | undefined;
+
+export async function resendVerificationCode(email: string): Promise<ResendState> {
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+  if (!user || user.emailVerified) {
+    // Don't reveal whether the account exists or is already verified.
+    return { message: "If that account needs verification, a new code has been sent." };
   }
+
+  const cooldownMessage = await checkResendCooldown(normalizedEmail);
+  if (cooldownMessage) {
+    return { message: cooldownMessage };
+  }
+
+  const code = await createVerificationToken(normalizedEmail);
+  try {
+    await sendVerificationEmail(normalizedEmail, code);
+  } catch (error) {
+    console.error("sendVerificationEmail failed during resend:", error);
+    return { message: "Something went wrong sending the email. Please try again shortly." };
+  }
+  return { message: "A new code has been sent." };
 }
 
 export async function logout() {

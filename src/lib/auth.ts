@@ -30,6 +30,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const isValidPassword = await bcrypt.compare(password, user.passwordHash);
         if (!isValidPassword) return null;
 
+        // Defense-in-depth backstop — login() already checks this and returns a
+        // specific message before ever reaching signIn(), but this ensures no
+        // other code path can grant a session to an unverified account.
+        if (!user.emailVerified) return null;
+
         return {
           id: user.id,
           email: user.email,
