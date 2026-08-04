@@ -69,6 +69,15 @@ export async function getFeaturedProducts(limit = 4) {
   return products.map(toCardDto);
 }
 
+// Lightweight — just enough for a <select> option list (custom-request form).
+export function getCustomizableProductOptions() {
+  return prisma.product.findMany({
+    where: { isActive: true, isCustomizable: true },
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
+}
+
 export async function getCustomizableProducts() {
   const products = await prisma.product.findMany({
     where: { isActive: true, isCustomizable: true },

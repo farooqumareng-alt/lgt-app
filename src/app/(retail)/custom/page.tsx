@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { Breadcrumbs } from "@/components/retail/breadcrumbs";
 import { ProductCard } from "@/components/retail/product-card";
+import { ButtonLink } from "@/components/ui/button";
 import { getCustomizableProducts } from "@/server/repositories/products";
 
 export const revalidate = 3600;
@@ -25,6 +26,17 @@ export default async function CustomPage() {
         Add your logo, initials, or a personal message to any of the pieces below —
         a lasting mark on genuine leather.
       </p>
+
+      <div className="mt-6 rounded-sm border border-cream-200 bg-cream-200/40 p-6">
+        <p className="font-display text-lg">Have something more specific in mind?</p>
+        <p className="mt-1 text-sm text-ink/70">
+          Tell us what you&apos;re picturing — a fully bespoke piece, a bulk order for
+          your team, or a design that isn&apos;t in the collection yet.
+        </p>
+        <ButtonLink href="/custom/request" className="mt-4">
+          Request a Custom Piece
+        </ButtonLink>
+      </div>
 
       {products.length === 0 ? (
         <p className="mt-12 text-ink/60">

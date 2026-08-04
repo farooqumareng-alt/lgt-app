@@ -23,6 +23,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/admin/wholesale-applications" className="hover:text-saddle">
             Wholesale Applications
           </Link>
+          <Link href="/admin/custom-requests" className="hover:text-saddle">
+            Custom Requests
+          </Link>
         </nav>
       </header>
       <main>{children}</main>

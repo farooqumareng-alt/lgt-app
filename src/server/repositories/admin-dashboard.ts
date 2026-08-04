@@ -21,29 +21,37 @@ export async function getAdminDashboardStats() {
   const todayStart = startOfDay(now);
   const monthStart = startOfMonth(now);
 
-  const [ordersToday, revenueToday, pendingWholesaleCount, revenueByChannelThisMonth, activeProducts, recentOrders] =
-    await Promise.all([
-      prisma.order.count({ where: { createdAt: { gte: todayStart } } }),
-      prisma.order.aggregate({
-        _sum: { grandTotal: true },
-        where: { createdAt: { gte: todayStart }, status: { notIn: [...NON_REVENUE_STATUSES] } },
-      }),
-      prisma.wholesaleAccount.count({ where: { approvalStatus: "PENDING" } }),
-      prisma.order.groupBy({
-        by: ["channel"],
-        _sum: { grandTotal: true },
-        where: { createdAt: { gte: monthStart }, status: { notIn: [...NON_REVENUE_STATUSES] } },
-      }),
-      prisma.product.findMany({
-        where: { isActive: true },
-        select: { id: true, name: true, variants: { select: { stockQuantity: true } } },
-      }),
-      prisma.order.findMany({
-        take: 8,
-        orderBy: { createdAt: "desc" },
-        include: { user: { select: { name: true, email: true } } },
-      }),
-    ]);
+  const [
+    ordersToday,
+    revenueToday,
+    pendingWholesaleCount,
+    newCustomRequestsCount,
+    revenueByChannelThisMonth,
+    activeProducts,
+    recentOrders,
+  ] = await Promise.all([
+    prisma.order.count({ where: { createdAt: { gte: todayStart } } }),
+    prisma.order.aggregate({
+      _sum: { grandTotal: true },
+      where: { createdAt: { gte: todayStart }, status: { notIn: [...NON_REVENUE_STATUSES] } },
+    }),
+    prisma.wholesaleAccount.count({ where: { approvalStatus: "PENDING" } }),
+    prisma.customRequest.count({ where: { status: "NEW" } }),
+    prisma.order.groupBy({
+      by: ["channel"],
+      _sum: { grandTotal: true },
+      where: { createdAt: { gte: monthStart }, status: { notIn: [...NON_REVENUE_STATUSES] } },
+    }),
+    prisma.product.findMany({
+      where: { isActive: true },
+      select: { id: true, name: true, variants: { select: { stockQuantity: true } } },
+    }),
+    prisma.order.findMany({
+      take: 8,
+      orderBy: { createdAt: "desc" },
+      include: { user: { select: { name: true, email: true } } },
+    }),
+  ]);
 
   const lowStockProducts = activeProducts
     .map((p) => ({ id: p.id, name: p.name, totalStock: p.variants.reduce((sum, v) => sum + v.stockQuantity, 0) }))
@@ -61,6 +69,7 @@ export async function getAdminDashboardStats() {
     ordersToday,
     revenueToday: Number(revenueToday._sum.grandTotal ?? 0),
     pendingWholesaleCount,
+    newCustomRequestsCount,
     retailRevenueThisMonth,
     wholesaleRevenueThisMonth,
     lowStockProducts,

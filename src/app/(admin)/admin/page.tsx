@@ -43,7 +43,7 @@ export default async function AdminDashboardPage() {
     <div className="mx-auto max-w-4xl px-6 py-12">
       <h1 className="font-display text-3xl">Dashboard</h1>
 
-      <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-5">
         <StatTile label="Orders Today" value={String(stats.ordersToday)} href="/admin/orders" />
         <StatTile label="Revenue Today" value={`$${stats.revenueToday.toFixed(2)}`} href="/admin/orders" />
         <StatTile
@@ -57,6 +57,12 @@ export default async function AdminDashboardPage() {
           value={String(stats.lowStockProducts.length)}
           href="/admin/products"
           tone={stats.lowStockProducts.length > 0 ? "warn" : undefined}
+        />
+        <StatTile
+          label="New Custom Requests"
+          value={String(stats.newCustomRequestsCount)}
+          href="/admin/custom-requests"
+          tone={stats.newCustomRequestsCount > 0 ? "warn" : undefined}
         />
       </div>
 

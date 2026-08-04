@@ -39,6 +39,7 @@ model User {
   orders           Order[]
   addresses        Address[]
   wholesaleAccount WholesaleAccount?
+  customRequests   CustomRequest[]
 
   @@index([role])
 }
@@ -169,9 +170,10 @@ model Product {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  images      ProductImage[]
-  variants    ProductVariant[]
-  priceBreaks WholesalePriceBreak[]
+  images         ProductImage[]
+  variants       ProductVariant[]
+  priceBreaks    WholesalePriceBreak[]
+  customRequests CustomRequest[]
 
   @@index([categoryId])
   @@index([isActive, isFeatured])
@@ -341,4 +343,43 @@ model OrderStatusEvent {
   createdAt DateTime    @default(now())
 
   @@index([orderId])
+}
+
+// ── Custom Requests ───────────────────────────────────
+
+enum CustomRequestStatus {
+  NEW
+  IN_REVIEW
+  QUOTED
+  APPROVED
+  COMPLETED
+  DECLINED
+}
+
+model CustomRequest {
+  id      String  @id @default(cuid())
+  userId  String?
+  user    User?   @relation(fields: [userId], references: [id])
+  name    String
+  email   String
+  phone   String?
+
+  // Optional link to a product the customer saw on /custom — not required,
+  // since fully bespoke requests with no matching product are expected too.
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+
+  description       String  @db.Text
+  budget             String?
+  referenceImageUrl  String?
+  referenceImageAlt  String?
+
+  status    CustomRequestStatus @default(NEW)
+  adminNote String?             @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([userId])
 }
