@@ -24,7 +24,12 @@ export default async function AdminProductsPage({ searchParams }: Props) {
     <div className="mx-auto max-w-4xl px-6 py-12">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-3xl">Products</h1>
-        <ButtonLink href="/admin/products/new">New Product</ButtonLink>
+        <div className="flex gap-2">
+          <ButtonLink href="/admin/products/bulk-upload" variant="secondary">
+            Bulk Upload
+          </ButtonLink>
+          <ButtonLink href="/admin/products/new">New Product</ButtonLink>
+        </div>
       </div>
 
       <form className="mt-6 flex items-end gap-3" method="get">
