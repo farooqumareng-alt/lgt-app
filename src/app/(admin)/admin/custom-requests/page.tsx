@@ -68,9 +68,14 @@ export default async function AdminCustomRequestsPage({ searchParams }: Props) {
                   {r.description.length > 80 ? "…" : ""}
                 </p>
               </div>
-              <Badge variant={r.status === "NEW" ? "solid" : "outline"} className="ml-3 shrink-0">
-                {r.status.replace("_", " ")}
-              </Badge>
+              <div className="ml-3 flex shrink-0 items-center gap-2">
+                {r._count.images > 0 && (
+                  <Badge variant="muted">
+                    {r._count.images} image{r._count.images === 1 ? "" : "s"}
+                  </Badge>
+                )}
+                <Badge variant={r.status === "NEW" ? "solid" : "outline"}>{r.status.replace("_", " ")}</Badge>
+              </div>
             </Card>
           </Link>
         ))}

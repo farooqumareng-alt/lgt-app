@@ -10,6 +10,9 @@ export type CustomRequestActionResult =
   | { success: true }
   | { success: false; errors?: Record<string, string[]>; message?: string };
 
+const MAX_IMAGES = 5;
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+
 // No login required — a lead-intake form, same "don't force an account"
 // principle as guest checkout. If the visitor is signed in we still link the
 // request to their userId so it shows up if they later view their account.
@@ -32,20 +35,24 @@ export async function submitCustomRequest(
   const session = await auth();
   const { name, email, phone, productId, description, budget } = parsed.data;
 
-  let referenceImageUrl: string | null = null;
-  let referenceImageAlt: string | null = null;
-  const file = formData.get("referenceImage");
-  if (file instanceof File && file.size > 0) {
-    if (!file.type.startsWith("image/")) {
-      return { success: false, message: "Reference file must be an image." };
-    }
-    if (file.size > 8 * 1024 * 1024) {
-      return { success: false, message: "Reference image must be under 8MB." };
-    }
-    const blob = await put(`custom-requests/${Date.now()}-${file.name}`, file, { access: "public" });
-    referenceImageUrl = blob.url;
-    referenceImageAlt = `Reference image from ${name}`;
+  const files = formData.getAll("referenceImages").filter((f): f is File => f instanceof File && f.size > 0);
+  if (files.length > MAX_IMAGES) {
+    return { success: false, message: `Please attach at most ${MAX_IMAGES} images.` };
   }
+  for (const file of files) {
+    if (!file.type.startsWith("image/")) {
+      return { success: false, message: "Reference files must be images." };
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      return { success: false, message: "Each reference image must be under 8MB." };
+    }
+  }
+
+  // Upload after validation passes for every file — never partially upload
+  // then fail, which would leave orphaned blobs with no DB row pointing at them.
+  const uploaded = await Promise.all(
+    files.map((file) => put(`custom-requests/${Date.now()}-${file.name}`, file, { access: "public" })),
+  );
 
   let validProductId: string | null = null;
   if (productId) {
@@ -62,8 +69,13 @@ export async function submitCustomRequest(
       productId: validProductId,
       description,
       budget: budget || null,
-      referenceImageUrl,
-      referenceImageAlt,
+      images: {
+        create: uploaded.map((blob, index) => ({
+          url: blob.url,
+          altText: `Reference image ${index + 1} from ${name}`,
+          sortOrder: index,
+        })),
+      },
     },
   });
 

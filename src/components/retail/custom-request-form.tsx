@@ -94,10 +94,18 @@ export function CustomRequestForm({ products }: { products: Product[] }) {
         </div>
 
         <div className="space-y-1 sm:col-span-2">
-          <label className="text-sm font-medium" htmlFor="referenceImage">
-            Reference image (optional)
+          <label className="text-sm font-medium" htmlFor="referenceImages">
+            Reference images (optional)
           </label>
-          <input id="referenceImage" name="referenceImage" type="file" accept="image/*" className="block text-sm" />
+          <input
+            id="referenceImages"
+            name="referenceImages"
+            type="file"
+            accept="image/*"
+            multiple
+            className="block text-sm"
+          />
+          <p className="text-xs text-ink/70">Up to 5 images — a logo file, design reference, or photos help us quote accurately.</p>
         </div>
       </div>
 

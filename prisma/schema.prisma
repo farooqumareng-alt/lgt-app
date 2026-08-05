@@ -369,10 +369,9 @@ model CustomRequest {
   productId String?
   product   Product? @relation(fields: [productId], references: [id])
 
-  description       String  @db.Text
-  budget             String?
-  referenceImageUrl  String?
-  referenceImageAlt  String?
+  description String  @db.Text
+  budget      String?
+  images      CustomRequestImage[]
 
   status    CustomRequestStatus @default(NEW)
   adminNote String?             @db.Text
@@ -382,4 +381,16 @@ model CustomRequest {
 
   @@index([status])
   @@index([userId])
+}
+
+model CustomRequestImage {
+  id              String        @id @default(cuid())
+  customRequestId String
+  customRequest   CustomRequest @relation(fields: [customRequestId], references: [id], onDelete: Cascade)
+  url             String
+  altText         String
+  sortOrder       Int           @default(0)
+  createdAt       DateTime      @default(now())
+
+  @@index([customRequestId])
 }

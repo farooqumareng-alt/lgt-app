@@ -68,17 +68,17 @@ export default async function AdminCustomRequestDetailPage({ params }: { params:
         <p className="mt-2 whitespace-pre-wrap text-sm text-ink/80">{request.description}</p>
       </Card>
 
-      {request.referenceImageUrl && (
+      {request.images.length > 0 && (
         <Card className="mt-6 p-6">
-          <p className="text-xs font-medium uppercase tracking-wide text-ink/70">Reference Image</p>
-          <div className="relative mt-3 h-64 w-full overflow-hidden rounded-sm">
-            <Image
-              src={request.referenceImageUrl}
-              alt={request.referenceImageAlt ?? "Reference image"}
-              fill
-              className="object-contain"
-              sizes="600px"
-            />
+          <p className="text-xs font-medium uppercase tracking-wide text-ink/70">
+            Reference Image{request.images.length === 1 ? "" : "s"}
+          </p>
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {request.images.map((image) => (
+              <div key={image.id} className="relative aspect-square overflow-hidden rounded-sm border border-cream-200">
+                <Image src={image.url} alt={image.altText} fill className="object-cover" sizes="200px" />
+              </div>
+            ))}
           </div>
         </Card>
       )}
