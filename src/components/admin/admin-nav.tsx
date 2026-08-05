@@ -18,7 +18,7 @@ export function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-wrap gap-1 text-sm font-medium">
+    <nav className="flex flex-col gap-1 text-sm font-medium">
       {LINKS.map((link) => {
         const active = link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href);
         return (
@@ -26,7 +26,7 @@ export function AdminNav() {
             key={link.href}
             href={link.href}
             className={cn(
-              "rounded-sm px-3 py-1.5 transition-colors duration-150",
+              "rounded-sm px-3 py-2 transition-colors duration-150",
               active ? "bg-saddle text-cream-50" : "text-ink/70 hover:bg-cream-200 hover:text-ink",
             )}
           >

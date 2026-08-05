@@ -36,7 +36,7 @@ export async function login(_prevState: FormState, formData: FormData): Promise<
     await signIn("credentials", {
       email: parsed.data.email,
       password: parsed.data.password,
-      redirectTo: "/account",
+      redirectTo: user?.role === "ADMIN" ? "/admin" : "/account",
     });
   } catch (error) {
     if (error instanceof AuthError) {
