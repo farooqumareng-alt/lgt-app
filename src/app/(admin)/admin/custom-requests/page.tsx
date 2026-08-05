@@ -53,7 +53,7 @@ export default async function AdminCustomRequestsPage({ searchParams }: Props) {
         {requests.length === 0 && <p className="text-ink/60">No requests match.</p>}
         {requests.map((r) => (
           <Link key={r.id} href={`/admin/custom-requests/${r.id}`}>
-            <Card interactive className="flex items-center justify-between p-4">
+            <Card interactive stitched className="flex items-center justify-between p-4">
               <div className="min-w-0">
                 <p className="text-sm font-medium">
                   {r.name}

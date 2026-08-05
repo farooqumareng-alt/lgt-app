@@ -78,7 +78,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
         {orders.length === 0 && <p className="text-ink/60">No orders match.</p>}
         {orders.map((order) => (
           <Link key={order.id} href={`/admin/orders/${order.orderNumber}`}>
-            <Card interactive className="flex items-center justify-between p-4">
+            <Card interactive stitched className="flex items-center justify-between p-4">
               <div>
                 <p className="text-sm font-medium">
                   {order.orderNumber}

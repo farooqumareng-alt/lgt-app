@@ -24,7 +24,7 @@ function StatTile({
   tone?: "warn";
 }) {
   const content = (
-    <Card interactive={!!href} className="p-5">
+    <Card interactive={!!href} stitched className="p-5">
       <p className="text-xs font-medium uppercase tracking-wide text-ink/50">{label}</p>
       <p className={`mt-2 font-display text-3xl ${tone === "warn" ? "text-saddle-700" : "text-ink"}`}>{value}</p>
     </Card>
@@ -73,7 +73,7 @@ export default async function AdminDashboardPage() {
             {stats.recentOrders.length === 0 && <p className="text-sm text-ink/60">No orders yet.</p>}
             {stats.recentOrders.map((order) => (
               <Link key={order.id} href={`/admin/orders/${order.orderNumber}`}>
-                <Card interactive className="flex items-center justify-between p-4">
+                <Card interactive stitched className="flex items-center justify-between p-4">
                   <div>
                     <p className="text-sm font-medium">
                       {order.orderNumber}

@@ -39,7 +39,7 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
         {orders.length === 0 && <p className="text-sm text-ink/60">No orders yet.</p>}
         {orders.map((order) => (
           <Link key={order.id} href={`/admin/orders/${order.orderNumber}`}>
-            <Card interactive className="flex items-center justify-between p-4">
+            <Card interactive stitched className="flex items-center justify-between p-4">
               <div>
                 <p className="text-sm font-medium">{order.orderNumber}</p>
                 <p className="text-xs text-ink/60">
