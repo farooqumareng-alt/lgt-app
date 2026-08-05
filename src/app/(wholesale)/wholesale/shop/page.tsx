@@ -17,7 +17,7 @@ export default async function WholesaleShopPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
       <h1 className="font-display text-3xl">Wholesale Shop</h1>
-      <p className="mt-2 text-sm text-ink/60">
+      <p className="mt-2 text-sm text-ink/70">
         Enter quantities below, or upload a CSV to add many items at once.
       </p>
 
@@ -27,7 +27,7 @@ export default async function WholesaleShopPage() {
 
       <div className="mt-8">
         {products.length === 0 ? (
-          <p className="text-ink/60">No wholesale products available yet.</p>
+          <p className="text-ink/70">No wholesale products available yet.</p>
         ) : (
           <BulkOrderGrid products={products} />
         )}

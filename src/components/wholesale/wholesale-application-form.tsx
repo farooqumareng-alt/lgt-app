@@ -43,7 +43,7 @@ export function WholesaleApplicationForm() {
           id="applicationNote"
           name="applicationNote"
           rows={4}
-          className="w-full rounded-sm border border-cream-300 bg-cream-50 px-3 py-2 text-sm text-ink placeholder:text-ink/40 focus-visible:border-saddle"
+          className="w-full rounded-sm border border-cream-300 bg-cream-50 px-3 py-2 text-sm text-ink placeholder:text-ink/70 focus-visible:border-saddle"
           placeholder="Business type, expected order volume, etc."
         />
       </div>

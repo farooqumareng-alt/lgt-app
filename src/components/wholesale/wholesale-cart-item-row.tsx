@@ -55,7 +55,7 @@ export function WholesaleCartItemRow({
           <Link href="/wholesale/shop" className="font-medium hover:text-saddle">
             {name}
           </Link>
-          {variantLabel && <p className="text-sm text-ink/60">{variantLabel}</p>}
+          {variantLabel && <p className="text-sm text-ink/70">{variantLabel}</p>}
           <p className="mt-1 text-sm text-ink/70">${unitPrice.toFixed(2)} / unit</p>
         </div>
 
@@ -85,7 +85,7 @@ export function WholesaleCartItemRow({
             type="button"
             disabled={isPending}
             onClick={remove}
-            className="text-sm text-ink/50 underline hover:text-saddle-700"
+            className="text-sm text-ink/70 underline hover:text-saddle-700"
           >
             Remove
           </button>

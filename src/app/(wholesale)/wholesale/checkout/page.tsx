@@ -51,7 +51,7 @@ export default async function WholesaleCheckoutPage({
           <span className="text-ink/70">Subtotal</span>
           <span className="font-medium">${subtotal.toFixed(2)}</span>
         </div>
-        <p className="text-xs text-ink/50">Freight and tax are calculated on the next step.</p>
+        <p className="text-xs text-ink/70">Freight and tax are calculated on the next step.</p>
       </div>
 
       <div className="mt-6 flex flex-col gap-3">

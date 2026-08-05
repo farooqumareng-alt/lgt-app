@@ -88,7 +88,7 @@ export function CustomRequestForm({ products }: { products: Product[] }) {
             rows={5}
             required
             placeholder="Item type, sizing, logo/engraving details, quantity, deadline — anything that helps us quote it accurately."
-            className="w-full rounded-sm border border-cream-300 bg-cream-50 px-3 py-2 text-sm text-ink placeholder:text-ink/40 focus-visible:border-saddle"
+            className="w-full rounded-sm border border-cream-300 bg-cream-50 px-3 py-2 text-sm text-ink placeholder:text-ink/70 focus-visible:border-saddle"
           />
           {errors?.description && <p className="text-sm text-saddle-700">{errors.description[0]}</p>}
         </div>

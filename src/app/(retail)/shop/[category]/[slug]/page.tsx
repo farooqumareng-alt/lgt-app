@@ -91,7 +91,7 @@ export default async function ProductPage({ params }: Props) {
           <div className="mt-8 space-y-4 border-t border-cream-200 pt-6">
             <p className="text-ink/80">{product.description}</p>
             {product.materials.length > 0 && (
-              <p className="text-sm text-ink/60">
+              <p className="text-sm text-ink/70">
                 <span className="font-medium text-ink">Materials:</span>{" "}
                 {product.materials.join(", ")}
               </p>

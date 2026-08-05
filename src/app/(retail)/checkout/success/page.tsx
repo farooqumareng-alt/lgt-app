@@ -42,7 +42,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
       <h1 className="mt-2 font-display text-3xl">Thank you for your order!</h1>
       {order && <p className="mt-2 text-ink/70">Order {order.orderNumber}</p>}
       {email && (
-        <p className="mt-1 text-sm text-ink/60">A receipt has been sent to {email} by Stripe.</p>
+        <p className="mt-1 text-sm text-ink/70">A receipt has been sent to {email} by Stripe.</p>
       )}
 
       <div className="mt-8 space-y-3 rounded-sm border border-cream-200 p-6 text-left">

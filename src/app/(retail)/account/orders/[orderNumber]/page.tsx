@@ -39,7 +39,7 @@ export default async function OrderDetailPage({ params }: Props) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl">{order.orderNumber}</h1>
-          <p className="text-sm text-ink/60">
+          <p className="text-sm text-ink/70">
             {new Date(order.createdAt).toLocaleDateString(undefined, {
               year: "numeric",
               month: "long",
@@ -98,7 +98,7 @@ export default async function OrderDetailPage({ params }: Props) {
           </p>
           {order.trackingNumber && (
             <p className="mt-4 text-sm">
-              <span className="text-ink/60">Tracking ({order.shippingCarrier}):</span>{" "}
+              <span className="text-ink/70">Tracking ({order.shippingCarrier}):</span>{" "}
               {order.trackingUrl ? (
                 <a href={order.trackingUrl} className="text-saddle hover:underline">
                   {order.trackingNumber}
@@ -118,9 +118,9 @@ export default async function OrderDetailPage({ params }: Props) {
             <div key={event.id} className="flex justify-between text-sm">
               <span>
                 <OrderStatusBadge status={event.status} />
-                {event.note && <span className="ml-2 text-ink/60">{event.note}</span>}
+                {event.note && <span className="ml-2 text-ink/70">{event.note}</span>}
               </span>
-              <span className="text-ink/50">
+              <span className="text-ink/70">
                 {new Date(event.createdAt).toLocaleString(undefined, {
                   dateStyle: "medium",
                   timeStyle: "short",

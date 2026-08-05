@@ -37,7 +37,7 @@ export function AddressCard({ address }: { address: Address }) {
         <button
           type="button"
           onClick={() => setEditing(false)}
-          className="mt-3 text-sm text-ink/50 underline"
+          className="mt-3 text-sm text-ink/70 underline"
         >
           Cancel
         </button>
@@ -87,7 +87,7 @@ export function AddressCard({ address }: { address: Address }) {
           type="button"
           disabled={isPending}
           onClick={() => startTransition(async () => { await deleteAddress(address.id); })}
-          className="text-ink/50 hover:text-saddle-700"
+          className="text-ink/70 hover:text-saddle-700"
         >
           Delete
         </button>

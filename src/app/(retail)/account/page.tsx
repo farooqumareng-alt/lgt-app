@@ -19,7 +19,7 @@ export default async function AccountDashboardPage() {
     <div className="space-y-8">
       <div>
         <h1 className="font-display text-2xl">Welcome back{session.user.name ? `, ${session.user.name}` : ""}</h1>
-        <p className="mt-1 text-sm text-ink/60">{session.user.email}</p>
+        <p className="mt-1 text-sm text-ink/70">{session.user.email}</p>
       </div>
 
       <div>
@@ -31,7 +31,7 @@ export default async function AccountDashboardPage() {
         </div>
 
         {recentOrders.length === 0 ? (
-          <p className="mt-4 text-sm text-ink/60">
+          <p className="mt-4 text-sm text-ink/70">
             No orders yet — <Link href="/shop" className="text-saddle hover:underline">start shopping</Link>.
           </p>
         ) : (
@@ -41,7 +41,7 @@ export default async function AccountDashboardPage() {
                 <Card interactive className="flex items-center justify-between p-4">
                   <div>
                     <p className="text-sm font-medium">{order.orderNumber}</p>
-                    <p className="text-xs text-ink/60">
+                    <p className="text-xs text-ink/70">
                       {order.items.length} item{order.items.length === 1 ? "" : "s"} · $
                       {Number(order.grandTotal).toFixed(2)}
                     </p>
@@ -58,20 +58,20 @@ export default async function AccountDashboardPage() {
         <Link href="/account/addresses">
           <Card interactive className="p-5">
             <p className="font-medium">Addresses</p>
-            <p className="text-sm text-ink/60">Manage your saved addresses</p>
+            <p className="text-sm text-ink/70">Manage your saved addresses</p>
           </Card>
         </Link>
         <Link href="/account/settings">
           <Card interactive className="p-5">
             <p className="font-medium">Settings</p>
-            <p className="text-sm text-ink/60">Update your name, email, and password</p>
+            <p className="text-sm text-ink/70">Update your name, email, and password</p>
           </Card>
         </Link>
         {session.user.role === "ADMIN" && (
           <Link href="/admin">
             <Card interactive className="p-5 sm:col-span-2">
               <p className="font-medium">Admin Dashboard</p>
-              <p className="text-sm text-ink/60">Orders, products, customers, and pending approvals</p>
+              <p className="text-sm text-ink/70">Orders, products, customers, and pending approvals</p>
             </Card>
           </Link>
         )}

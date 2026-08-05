@@ -36,11 +36,11 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
 
       <form className="mt-6 flex flex-wrap items-end gap-3" method="get">
         <div>
-          <label className="text-xs text-ink/60">Search</label>
+          <label className="text-xs text-ink/70">Search</label>
           <Input name="q" defaultValue={q ?? ""} placeholder="Order # or email" />
         </div>
         <div>
-          <label className="text-xs text-ink/60">Status</label>
+          <label className="text-xs text-ink/70">Status</label>
           <select
             name="status"
             defaultValue={status ?? ""}
@@ -55,7 +55,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
           </select>
         </div>
         <div>
-          <label className="text-xs text-ink/60">Channel</label>
+          <label className="text-xs text-ink/70">Channel</label>
           <select
             name="channel"
             defaultValue={channel ?? ""}
@@ -75,7 +75,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
       </form>
 
       <div className="mt-8 space-y-3">
-        {orders.length === 0 && <p className="text-ink/60">No orders match.</p>}
+        {orders.length === 0 && <p className="text-ink/70">No orders match.</p>}
         {orders.map((order) => (
           <Link key={order.id} href={`/admin/orders/${order.orderNumber}`}>
             <Card interactive stitched className="flex items-center justify-between p-4">
@@ -86,7 +86,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
                     {order.channel}
                   </Badge>
                 </p>
-                <p className="text-xs text-ink/60">
+                <p className="text-xs text-ink/70">
                   {order.user?.name ?? order.user?.email ?? order.guestEmail ?? "Guest"} ·{" "}
                   {order.items.length} item{order.items.length === 1 ? "" : "s"} · $
                   {Number(order.grandTotal).toFixed(2)}

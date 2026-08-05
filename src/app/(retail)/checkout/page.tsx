@@ -55,7 +55,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
           <span className="text-ink/70">Subtotal</span>
           <span className="font-medium">${subtotal.toFixed(2)}</span>
         </div>
-        <p className="text-xs text-ink/50">
+        <p className="text-xs text-ink/70">
           Shipping options and tax are calculated on the next step.
         </p>
       </div>

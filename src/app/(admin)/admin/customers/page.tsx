@@ -25,7 +25,7 @@ export default async function AdminCustomersPage({ searchParams }: Props) {
 
       <form className="mt-6 flex items-end gap-3" method="get">
         <div>
-          <label className="text-xs text-ink/60">Search</label>
+          <label className="text-xs text-ink/70">Search</label>
           <Input name="q" defaultValue={q ?? ""} placeholder="Name or email" />
         </div>
         <Button type="submit" variant="secondary">
@@ -34,13 +34,13 @@ export default async function AdminCustomersPage({ searchParams }: Props) {
       </form>
 
       <div className="mt-8 space-y-3">
-        {customers.length === 0 && <p className="text-ink/60">No customers match.</p>}
+        {customers.length === 0 && <p className="text-ink/70">No customers match.</p>}
         {customers.map((customer) => (
           <Link key={customer.id} href={`/admin/customers/${customer.id}`}>
             <Card interactive stitched className="flex items-center justify-between p-4">
               <div>
                 <p className="text-sm font-medium">{customer.name ?? "—"}</p>
-                <p className="text-xs text-ink/60">{customer.email}</p>
+                <p className="text-xs text-ink/70">{customer.email}</p>
               </div>
               <div className="text-right text-sm text-ink/70">
                 <p>

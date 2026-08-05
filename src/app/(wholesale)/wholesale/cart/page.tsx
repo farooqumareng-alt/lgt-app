@@ -42,7 +42,7 @@ export default async function WholesaleCartPage({
 
       {items.length === 0 ? (
         <div className="mt-12 space-y-4 text-center">
-          <p className="text-ink/60">Your wholesale cart is empty.</p>
+          <p className="text-ink/70">Your wholesale cart is empty.</p>
           <ButtonLink href="/wholesale/shop">Browse Wholesale Shop</ButtonLink>
         </div>
       ) : (
@@ -58,9 +58,9 @@ export default async function WholesaleCartPage({
               <span className="text-ink/70">Subtotal</span>
               <span className="font-medium">${subtotal.toFixed(2)}</span>
             </div>
-            <p className="text-xs text-ink/50">Freight and tax calculated at checkout.</p>
+            <p className="text-xs text-ink/70">Freight and tax calculated at checkout.</p>
             {minimumOrderValue !== null && (
-              <p className="text-xs text-ink/50">Minimum order: ${minimumOrderValue.toFixed(2)}</p>
+              <p className="text-xs text-ink/70">Minimum order: ${minimumOrderValue.toFixed(2)}</p>
             )}
             {belowMinimum ? (
               <p className="text-sm text-saddle-700">

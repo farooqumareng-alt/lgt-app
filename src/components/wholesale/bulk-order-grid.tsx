@@ -77,7 +77,7 @@ export function BulkOrderGrid({ products }: { products: WholesaleProduct[] }) {
                   return (
                     <div key={variant.id} className="flex items-center gap-3 text-sm">
                       <span className="w-40 truncate text-ink/70">{label}</span>
-                      <span className="w-16 text-ink/50">${variant.unitPrice.toFixed(2)}</span>
+                      <span className="w-16 text-ink/70">${variant.unitPrice.toFixed(2)}</span>
                       <input
                         type="number"
                         name={`qty_${variant.sku}`}
@@ -87,7 +87,7 @@ export function BulkOrderGrid({ products }: { products: WholesaleProduct[] }) {
                         disabled={variant.stockQuantity === 0}
                         className="w-20 rounded-sm border border-cream-300 bg-cream-50 px-2 py-1 disabled:opacity-40"
                       />
-                      <span className="text-xs text-ink/40">
+                      <span className="text-xs text-ink/70">
                         {variant.stockQuantity === 0 ? "Out of stock" : `${variant.stockQuantity} in stock`}
                       </span>
                     </div>

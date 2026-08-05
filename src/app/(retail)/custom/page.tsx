@@ -39,7 +39,7 @@ export default async function CustomPage() {
       </div>
 
       {products.length === 0 ? (
-        <p className="mt-12 text-ink/60">
+        <p className="mt-12 text-ink/70">
           No customizable products are available yet — check back soon.
         </p>
       ) : (

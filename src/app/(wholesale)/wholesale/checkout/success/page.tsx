@@ -29,7 +29,7 @@ export default async function WholesaleCheckoutSuccessPage({ searchParams }: Pro
         <p className="text-sm font-medium uppercase tracking-widest text-saddle">Order Placed</p>
         <h1 className="mt-2 font-display text-3xl">Thanks — your order is invoiced.</h1>
         <p className="mt-2 text-ink/70">Order {order.orderNumber}</p>
-        <p className="mt-1 text-sm text-ink/60">
+        <p className="mt-1 text-sm text-ink/70">
           We&apos;ve sent an invoice to your business email. Payment is due under your net-terms
           agreement.
         </p>

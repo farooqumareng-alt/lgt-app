@@ -13,7 +13,7 @@ export function ProductImageGallery({ images }: { images: ProductImage[] }) {
   const router = useRouter();
 
   if (images.length === 0) {
-    return <p className="text-sm text-ink/60">No images uploaded yet.</p>;
+    return <p className="text-sm text-ink/70">No images uploaded yet.</p>;
   }
 
   return (
@@ -23,7 +23,7 @@ export function ProductImageGallery({ images }: { images: ProductImage[] }) {
           <div className="relative aspect-square overflow-hidden rounded-sm bg-cream-100">
             <Image src={image.url} alt={image.altText} fill className="object-cover" sizes="150px" />
           </div>
-          <p className="truncate text-xs text-ink/60">{image.altText}</p>
+          <p className="truncate text-xs text-ink/70">{image.altText}</p>
           <div className="flex items-center justify-between text-xs">
             {image.isPrimary ? (
               <span className="font-medium text-saddle">Primary</span>
@@ -51,7 +51,7 @@ export function ProductImageGallery({ images }: { images: ProductImage[] }) {
                   router.refresh();
                 })
               }
-              className="text-ink/50 hover:text-saddle-700"
+              className="text-ink/70 hover:text-saddle-700"
             >
               Remove
             </button>

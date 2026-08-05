@@ -21,7 +21,7 @@ export function NewAddressSection() {
   return (
     <Card className="p-6">
       <AddressForm action={createAddress} submitLabel="Add Address" onSuccess={() => setOpen(false)} />
-      <button type="button" onClick={() => setOpen(false)} className="mt-3 text-sm text-ink/50 underline">
+      <button type="button" onClick={() => setOpen(false)} className="mt-3 text-sm text-ink/70 underline">
         Cancel
       </button>
     </Card>

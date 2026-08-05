@@ -50,7 +50,7 @@ export function OrderStatusForm({ orderId, currentStatus }: { orderId: string; c
           {isPending ? "Updating…" : "Update Status"}
         </Button>
       </div>
-      {message && <p className="text-sm text-ink/60">{message}</p>}
+      {message && <p className="text-sm text-ink/70">{message}</p>}
     </div>
   );
 }

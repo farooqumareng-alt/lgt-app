@@ -18,7 +18,7 @@ export function ImageUploadForm({ productId }: { productId: string }) {
   return (
     <form ref={formRef} action={formAction} className="flex flex-wrap items-end gap-2">
       <div>
-        <label className="text-xs text-ink/60">Image file</label>
+        <label className="text-xs text-ink/70">Image file</label>
         <input
           type="file"
           name="file"
@@ -28,7 +28,7 @@ export function ImageUploadForm({ productId }: { productId: string }) {
         />
       </div>
       <div>
-        <label className="text-xs text-ink/60">Alt text (required)</label>
+        <label className="text-xs text-ink/70">Alt text (required)</label>
         <Input name="altText" placeholder="Describe the image" required />
       </div>
       <Button type="submit" variant="secondary" loading={pending}>

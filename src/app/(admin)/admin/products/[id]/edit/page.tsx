@@ -31,7 +31,7 @@ export default async function EditProductPage({ params }: Props) {
     <div className="mx-auto max-w-3xl space-y-10 px-6 py-12">
       <div>
         <h1 className="font-display text-3xl">{product.name}</h1>
-        <p className="mt-1 text-sm text-ink/60">SKU {product.sku}</p>
+        <p className="mt-1 text-sm text-ink/70">SKU {product.sku}</p>
       </div>
 
       <Card className="p-6">
@@ -81,7 +81,7 @@ export default async function EditProductPage({ params }: Props) {
       {product.basePriceWholesale && (
         <div>
           <h2 className="font-medium">Wholesale Price Breaks</h2>
-          <p className="mt-1 text-sm text-ink/60">
+          <p className="mt-1 text-sm text-ink/70">
             Base wholesale price is ${Number(product.basePriceWholesale).toFixed(2)}. Breaks below apply at
             higher quantities.
           </p>

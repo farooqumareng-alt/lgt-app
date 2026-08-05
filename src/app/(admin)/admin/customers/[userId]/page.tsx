@@ -25,7 +25,7 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
       <h1 className="font-display text-2xl">{customer.name ?? customer.email}</h1>
-      <p className="mt-1 text-sm text-ink/60">
+      <p className="mt-1 text-sm text-ink/70">
         {customer.email} · Joined{" "}
         {new Date(customer.createdAt).toLocaleDateString(undefined, {
           year: "numeric",
@@ -36,13 +36,13 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
 
       <h2 className="mt-8 font-medium">Order History</h2>
       <div className="mt-4 space-y-3">
-        {orders.length === 0 && <p className="text-sm text-ink/60">No orders yet.</p>}
+        {orders.length === 0 && <p className="text-sm text-ink/70">No orders yet.</p>}
         {orders.map((order) => (
           <Link key={order.id} href={`/admin/orders/${order.orderNumber}`}>
             <Card interactive stitched className="flex items-center justify-between p-4">
               <div>
                 <p className="text-sm font-medium">{order.orderNumber}</p>
-                <p className="text-xs text-ink/60">
+                <p className="text-xs text-ink/70">
                   {new Date(order.createdAt).toLocaleDateString(undefined, {
                     year: "numeric",
                     month: "long",

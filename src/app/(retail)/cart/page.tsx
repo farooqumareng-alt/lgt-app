@@ -22,7 +22,7 @@ export default async function CartPage() {
 
       {items.length === 0 ? (
         <div className="mt-12 space-y-4 text-center">
-          <p className="text-ink/60">Your cart is empty.</p>
+          <p className="text-ink/70">Your cart is empty.</p>
           <ButtonLink href="/shop">Shop the Collection</ButtonLink>
         </div>
       ) : (
@@ -38,7 +38,7 @@ export default async function CartPage() {
               <span className="text-ink/70">Subtotal</span>
               <span className="font-medium">${subtotal.toFixed(2)}</span>
             </div>
-            <p className="text-xs text-ink/50">Shipping and tax calculated at checkout.</p>
+            <p className="text-xs text-ink/70">Shipping and tax calculated at checkout.</p>
             <ButtonLink href="/checkout" className="w-full text-center">
               Checkout
             </ButtonLink>

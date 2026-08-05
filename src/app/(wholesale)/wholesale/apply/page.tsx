@@ -24,7 +24,7 @@ export default async function WholesaleApplyPage() {
   return (
     <div className="mx-auto max-w-lg px-6 py-12">
       <h1 className="font-display text-3xl">Apply for a Wholesale Account</h1>
-      <p className="mt-2 text-sm text-ink/60">
+      <p className="mt-2 text-sm text-ink/70">
         We&apos;ll review your application and follow up once it&apos;s approved.
       </p>
       <div className="mt-8">

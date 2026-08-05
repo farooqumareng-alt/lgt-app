@@ -22,11 +22,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="/" className="text-sm font-medium text-ink/60 hover:text-saddle">
+            <Link href="/" className="text-sm font-medium text-ink/70 hover:text-saddle">
               View Store
             </Link>
             {session?.user?.email && (
-              <span className="hidden text-sm text-ink/50 md:inline">{session.user.email}</span>
+              <span className="hidden text-sm text-ink/70 md:inline">{session.user.email}</span>
             )}
             <form action={logout}>
               <Button type="submit" variant="secondary">

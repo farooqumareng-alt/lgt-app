@@ -23,21 +23,21 @@ export default async function WholesaleApplicationsPage() {
     <div className="mx-auto max-w-3xl px-6 py-12">
       <h1 className="font-display text-3xl">Wholesale Applications</h1>
       <div className="mt-8 space-y-4">
-        {accounts.length === 0 && <p className="text-ink/60">No applications yet.</p>}
+        {accounts.length === 0 && <p className="text-ink/70">No applications yet.</p>}
         {accounts.map((account) => (
           <Card key={account.id} className="p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="font-medium">{account.businessName}</p>
-                <p className="text-sm text-ink/60">
+                <p className="text-sm text-ink/70">
                   {account.user.name} — {account.user.email}
                 </p>
-                {account.taxId && <p className="text-sm text-ink/60">Tax ID: {account.taxId}</p>}
-                <p className="text-sm text-ink/60">Phone: {account.phone}</p>
+                {account.taxId && <p className="text-sm text-ink/70">Tax ID: {account.taxId}</p>}
+                <p className="text-sm text-ink/70">Phone: {account.phone}</p>
                 {account.applicationNote && (
                   <p className="mt-2 text-sm text-ink/70">{account.applicationNote}</p>
                 )}
-                <p className="mt-2 text-xs uppercase tracking-wide text-ink/50">
+                <p className="mt-2 text-xs uppercase tracking-wide text-ink/70">
                   {account.approvalStatus}
                 </p>
               </div>

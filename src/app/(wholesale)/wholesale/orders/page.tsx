@@ -20,7 +20,7 @@ export default async function WholesaleOrdersPage() {
       <h1 className="font-display text-2xl">Wholesale Orders</h1>
 
       {orders.length === 0 ? (
-        <p className="mt-6 text-sm text-ink/60">
+        <p className="mt-6 text-sm text-ink/70">
           No orders yet —{" "}
           <Link href="/wholesale/shop" className="text-saddle hover:underline">
             browse the wholesale shop
@@ -34,7 +34,7 @@ export default async function WholesaleOrdersPage() {
               <Card interactive className="flex items-center justify-between p-4">
                 <div>
                   <p className="text-sm font-medium">{order.orderNumber}</p>
-                  <p className="text-xs text-ink/60">
+                  <p className="text-xs text-ink/70">
                     {new Date(order.createdAt).toLocaleDateString(undefined, {
                       year: "numeric",
                       month: "long",

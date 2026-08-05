@@ -54,7 +54,7 @@ export function VerifyEmailForm({ email }: { email: string }) {
         >
           {isResending ? "Sending…" : "Resend code"}
         </button>
-        {resendMessage && <p className="mt-1 text-ink/60">{resendMessage}</p>}
+        {resendMessage && <p className="mt-1 text-ink/70">{resendMessage}</p>}
       </div>
     </div>
   );

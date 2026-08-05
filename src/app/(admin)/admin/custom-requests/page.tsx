@@ -50,7 +50,7 @@ export default async function AdminCustomRequestsPage({ searchParams }: Props) {
       </div>
 
       <div className="mt-8 space-y-3">
-        {requests.length === 0 && <p className="text-ink/60">No requests match.</p>}
+        {requests.length === 0 && <p className="text-ink/70">No requests match.</p>}
         {requests.map((r) => (
           <Link key={r.id} href={`/admin/custom-requests/${r.id}`}>
             <Card interactive stitched className="flex items-center justify-between p-4">
@@ -63,7 +63,7 @@ export default async function AdminCustomRequestsPage({ searchParams }: Props) {
                     </Badge>
                   )}
                 </p>
-                <p className="truncate text-xs text-ink/60">
+                <p className="truncate text-xs text-ink/70">
                   {r.email} · {r.description.slice(0, 80)}
                   {r.description.length > 80 ? "…" : ""}
                 </p>

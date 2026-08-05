@@ -69,7 +69,7 @@ export default async function CategoryPage({ params }: Props) {
       </div>
 
       {products.length === 0 ? (
-        <p className="mt-12 text-ink/60">No products in this category yet.</p>
+        <p className="mt-12 text-ink/70">No products in this category yet.</p>
       ) : (
         <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => (

@@ -85,7 +85,7 @@ export default async function HomePage() {
           {TRUST_POINTS.map((point) => (
             <div key={point.title}>
               <p className="font-medium">{point.title}</p>
-              <p className="mt-1 text-sm text-ink/60">{point.description}</p>
+              <p className="mt-1 text-sm text-ink/70">{point.description}</p>
             </div>
           ))}
         </div>

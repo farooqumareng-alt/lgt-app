@@ -46,7 +46,7 @@ export function CsvUploadForm() {
   return (
     <div className="rounded-sm border border-cream-200 p-4">
       <p className="text-sm font-medium">Bulk upload via CSV</p>
-      <p className="mt-1 text-xs text-ink/50">Two columns, no header required: sku,quantity</p>
+      <p className="mt-1 text-xs text-ink/70">Two columns, no header required: sku,quantity</p>
       <input
         ref={inputRef}
         type="file"

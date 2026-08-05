@@ -71,7 +71,7 @@ function VariantEditForm({ variant, onDone }: { variant: Variant; onDone: () => 
         <Button type="submit" loading={pending}>
           {pending ? "Saving…" : "Save"}
         </Button>
-        <button type="button" onClick={onDone} className="text-sm text-ink/50 underline">
+        <button type="button" onClick={onDone} className="text-sm text-ink/70 underline">
           Cancel
         </button>
       </div>
@@ -102,7 +102,7 @@ export function VariantRow({ variant }: { variant: Variant }) {
     <div className="flex flex-wrap items-center justify-between gap-2 rounded-sm border border-cream-200 p-3 text-sm">
       <div>
         <span className="font-medium">{variant.sku}</span>
-        <span className="ml-2 text-ink/60">{label}</span>
+        <span className="ml-2 text-ink/70">{label}</span>
         {!variant.isActive && (
           <Badge variant="muted" className="ml-2">
             Inactive

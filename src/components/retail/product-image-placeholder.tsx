@@ -19,7 +19,7 @@ export function ProductImagePlaceholder({ className }: { className?: string }) {
         <path d="M7 8V6a5 5 0 0 1 10 0v2" strokeLinecap="round" />
         <rect x="4" y="8" width="16" height="12" rx="1.5" />
       </svg>
-      <span className="text-xs font-medium uppercase tracking-wide text-ink/50">
+      <span className="text-xs font-medium uppercase tracking-wide text-ink/70">
         Photo coming soon
       </span>
     </div>

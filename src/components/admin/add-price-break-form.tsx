@@ -19,12 +19,12 @@ export function AddPriceBreakForm({ productId }: { productId: string }) {
   return (
     <form ref={formRef} action={formAction} className="flex flex-wrap items-end gap-2">
       <div>
-        <label className="text-xs text-ink/60">Min quantity</label>
+        <label className="text-xs text-ink/70">Min quantity</label>
         <Input name="minQuantity" type="number" min="2" placeholder="10" required />
         {errors?.minQuantity && <p className="text-xs text-saddle-700">{errors.minQuantity[0]}</p>}
       </div>
       <div>
-        <label className="text-xs text-ink/60">Price per unit ($)</label>
+        <label className="text-xs text-ink/70">Price per unit ($)</label>
         <Input name="price" type="number" step="0.01" min="0" placeholder="15.00" required />
         {errors?.price && <p className="text-xs text-saddle-700">{errors.price[0]}</p>}
       </div>

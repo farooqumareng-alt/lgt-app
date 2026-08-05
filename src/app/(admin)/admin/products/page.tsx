@@ -29,7 +29,7 @@ export default async function AdminProductsPage({ searchParams }: Props) {
 
       <form className="mt-6 flex items-end gap-3" method="get">
         <div>
-          <label className="text-xs text-ink/60">Search</label>
+          <label className="text-xs text-ink/70">Search</label>
           <Input name="q" defaultValue={q ?? ""} placeholder="Name or SKU" />
         </div>
         <Button type="submit" variant="secondary">
@@ -38,15 +38,15 @@ export default async function AdminProductsPage({ searchParams }: Props) {
       </form>
 
       <div className="mt-8 space-y-3">
-        {products.length === 0 && <p className="text-ink/60">No products match.</p>}
+        {products.length === 0 && <p className="text-ink/70">No products match.</p>}
         {products.map((product) => (
           <Link key={product.id} href={`/admin/products/${product.id}/edit`}>
             <Card interactive stitched className="flex items-center justify-between p-4">
               <div>
                 <p className="font-medium">
-                  {product.name} <span className="text-ink/50">({product.sku})</span>
+                  {product.name} <span className="text-ink/70">({product.sku})</span>
                 </p>
-                <p className="text-sm text-ink/60">
+                <p className="text-sm text-ink/70">
                   {product.category.name} · {product.variants.length} variant
                   {product.variants.length === 1 ? "" : "s"} · Retail $
                   {Number(product.basePriceRetail).toFixed(2)}

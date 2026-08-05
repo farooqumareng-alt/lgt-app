@@ -25,7 +25,7 @@ function StatTile({
 }) {
   const content = (
     <Card interactive={!!href} stitched className="p-5">
-      <p className="text-xs font-medium uppercase tracking-wide text-ink/50">{label}</p>
+      <p className="text-xs font-medium uppercase tracking-wide text-ink/70">{label}</p>
       <p className={`mt-2 font-display text-3xl ${tone === "warn" ? "text-saddle-700" : "text-ink"}`}>{value}</p>
     </Card>
   );
@@ -70,7 +70,7 @@ export default async function AdminDashboardPage() {
         <section>
           <h2 className="font-display text-xl">Recent Orders</h2>
           <div className="mt-4 space-y-3">
-            {stats.recentOrders.length === 0 && <p className="text-sm text-ink/60">No orders yet.</p>}
+            {stats.recentOrders.length === 0 && <p className="text-sm text-ink/70">No orders yet.</p>}
             {stats.recentOrders.map((order) => (
               <Link key={order.id} href={`/admin/orders/${order.orderNumber}`}>
                 <Card interactive stitched className="flex items-center justify-between p-4">
@@ -81,7 +81,7 @@ export default async function AdminDashboardPage() {
                         {order.channel}
                       </Badge>
                     </p>
-                    <p className="text-xs text-ink/60">
+                    <p className="text-xs text-ink/70">
                       {order.user?.name ?? order.user?.email ?? order.guestEmail ?? "Guest"} · $
                       {Number(order.grandTotal).toFixed(2)}
                     </p>
@@ -107,7 +107,7 @@ export default async function AdminDashboardPage() {
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-cream-200">
               <div className="h-full bg-saddle" style={{ width: `${wholesalePct}%` }} />
             </div>
-            <p className="mt-2 text-xs text-ink/50">{wholesalePct}% of this month&apos;s revenue is wholesale</p>
+            <p className="mt-2 text-xs text-ink/70">{wholesalePct}% of this month&apos;s revenue is wholesale</p>
             <div className="mt-4 flex justify-between border-t border-cream-200 pt-3 text-sm font-medium">
               <span>Total</span>
               <span>${monthRevenue.toFixed(2)}</span>
@@ -116,7 +116,7 @@ export default async function AdminDashboardPage() {
 
           <h2 className="mt-8 font-display text-xl">Low Stock</h2>
           <Card className="mt-4 p-5">
-            {stats.lowStockProducts.length === 0 && <p className="text-sm text-ink/60">Everything is well stocked.</p>}
+            {stats.lowStockProducts.length === 0 && <p className="text-sm text-ink/70">Everything is well stocked.</p>}
             {stats.lowStockProducts.length > 0 && (
               <ul className="space-y-2">
                 {stats.lowStockProducts.slice(0, 6).map((p) => (

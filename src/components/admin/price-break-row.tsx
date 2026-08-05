@@ -25,7 +25,7 @@ export function PriceBreakRow({ priceBreak }: { priceBreak: PriceBreak }) {
             router.refresh();
           })
         }
-        className="text-ink/50 hover:text-saddle-700"
+        className="text-ink/70 hover:text-saddle-700"
       >
         Remove
       </button>
