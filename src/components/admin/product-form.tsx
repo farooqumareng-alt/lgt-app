@@ -1,10 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { ProductActionResult } from "@/server/actions/admin-products";
+import { generateProductListingCopy } from "@/server/actions/admin-ai";
 
 type Category = { id: string; name: string };
 
@@ -44,14 +45,50 @@ export function ProductForm({
   const [state, formAction, pending] = useActionState(action, undefined);
   const errors = state && !state.success ? state.errors : undefined;
 
+  const formRef = useRef<HTMLFormElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const materialsRef = useRef<HTMLInputElement>(null);
+  const isCustomizableRef = useRef<HTMLInputElement>(null);
+  const shortDescriptionRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
+  const metaTitleRef = useRef<HTMLInputElement>(null);
+  const metaDescriptionRef = useRef<HTMLInputElement>(null);
+
+  const [isGenerating, startGenerating] = useTransition();
+  const [aiMessage, setAiMessage] = useState<string | null>(null);
+
+  function handleGenerateCopy() {
+    setAiMessage(null);
+    const categorySelect = formRef.current?.elements.namedItem("categoryId") as HTMLSelectElement | null;
+    const categoryName = categorySelect?.selectedOptions[0]?.text ?? "";
+
+    startGenerating(async () => {
+      const result = await generateProductListingCopy({
+        name: nameRef.current?.value ?? "",
+        categoryName,
+        materials: materialsRef.current?.value ?? "",
+        isCustomizable: isCustomizableRef.current?.checked ?? false,
+      });
+      if (!result.success) {
+        setAiMessage(result.message);
+        return;
+      }
+      if (shortDescriptionRef.current) shortDescriptionRef.current.value = result.copy.shortDescription;
+      if (descriptionRef.current) descriptionRef.current.value = result.copy.description;
+      if (metaTitleRef.current) metaTitleRef.current.value = result.copy.metaTitle;
+      if (metaDescriptionRef.current) metaDescriptionRef.current.value = result.copy.metaDescription;
+      setAiMessage("Generated — review and edit before saving.");
+    });
+  }
+
   return (
-    <form action={formAction} className="space-y-4">
+    <form ref={formRef} action={formAction} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1 sm:col-span-2">
           <label className="text-sm font-medium" htmlFor="name">
             Name
           </label>
-          <Input id="name" name="name" defaultValue={defaultValues?.name ?? ""} required />
+          <Input id="name" name="name" ref={nameRef} defaultValue={defaultValues?.name ?? ""} required />
           {errors?.name && <p className="text-sm text-saddle-700">{errors.name[0]}</p>}
         </div>
 
@@ -95,12 +132,23 @@ export function ProductForm({
         </div>
 
         <div className="space-y-1 sm:col-span-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">Listing copy</p>
+            <Button type="button" variant="secondary" loading={isGenerating} onClick={handleGenerateCopy}>
+              {isGenerating ? "Generating…" : "Generate with AI"}
+            </Button>
+          </div>
+          {aiMessage && <p className="mt-1 text-xs text-ink/70">{aiMessage}</p>}
+        </div>
+
+        <div className="space-y-1 sm:col-span-2">
           <label className="text-sm font-medium" htmlFor="shortDescription">
             Short description (optional)
           </label>
           <Input
             id="shortDescription"
             name="shortDescription"
+            ref={shortDescriptionRef}
             defaultValue={defaultValues?.shortDescription ?? ""}
           />
         </div>
@@ -112,6 +160,7 @@ export function ProductForm({
           <textarea
             id="description"
             name="description"
+            ref={descriptionRef}
             rows={4}
             defaultValue={defaultValues?.description ?? ""}
             required
@@ -125,6 +174,7 @@ export function ProductForm({
             Materials (comma-separated)
           </label>
           <Input
+            ref={materialsRef}
             id="materials"
             name="materials"
             defaultValue={defaultValues?.materials?.join(", ") ?? ""}
@@ -169,7 +219,7 @@ export function ProductForm({
           <label className="text-sm font-medium" htmlFor="metaTitle">
             Meta title (optional)
           </label>
-          <Input id="metaTitle" name="metaTitle" defaultValue={defaultValues?.metaTitle ?? ""} />
+          <Input id="metaTitle" name="metaTitle" ref={metaTitleRef} defaultValue={defaultValues?.metaTitle ?? ""} />
         </div>
 
         <div className="space-y-1">
@@ -179,6 +229,7 @@ export function ProductForm({
           <Input
             id="metaDescription"
             name="metaDescription"
+            ref={metaDescriptionRef}
             defaultValue={defaultValues?.metaDescription ?? ""}
           />
         </div>
@@ -197,6 +248,7 @@ export function ProductForm({
           <input
             type="checkbox"
             name="isCustomizable"
+            ref={isCustomizableRef}
             defaultChecked={defaultValues?.isCustomizable ?? false}
           />
           Customizable
