@@ -4,9 +4,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 
+import { Badge } from "@/components/ui/badge";
 import { deleteProductImage, setImagePrimary } from "@/server/actions/admin-images";
 
-type ProductImage = { id: string; url: string; altText: string; isPrimary: boolean };
+type ProductImage = { id: string; url: string; altText: string; isPrimary: boolean; isAiGenerated: boolean };
 
 export function ProductImageGallery({ images }: { images: ProductImage[] }) {
   const [isPending, startTransition] = useTransition();
@@ -22,6 +23,11 @@ export function ProductImageGallery({ images }: { images: ProductImage[] }) {
         <div key={image.id} className="space-y-1 rounded-sm border border-cream-200 p-2">
           <div className="relative aspect-square overflow-hidden rounded-sm bg-cream-100">
             <Image src={image.url} alt={image.altText} fill className="object-cover" sizes="150px" />
+            {image.isAiGenerated && (
+              <Badge variant="solid" className="absolute left-1 top-1">
+                AI placeholder
+              </Badge>
+            )}
           </div>
           <p className="truncate text-xs text-ink/70">{image.altText}</p>
           <div className="flex items-center justify-between text-xs">

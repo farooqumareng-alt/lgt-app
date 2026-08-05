@@ -10,6 +10,7 @@ import { PriceBreakRow } from "@/components/admin/price-break-row";
 import { AddPriceBreakForm } from "@/components/admin/add-price-break-form";
 import { ProductImageGallery } from "@/components/admin/product-image-gallery";
 import { ImageUploadForm } from "@/components/admin/image-upload-form";
+import { GenerateImageForm } from "@/components/admin/generate-image-form";
 import { getAllCategories, getProductForEdit } from "@/server/repositories/admin-products";
 import { updateProduct } from "@/server/actions/admin-products";
 
@@ -103,6 +104,14 @@ export default async function EditProductPage({ params }: Props) {
         </div>
         <div className="mt-4">
           <ImageUploadForm productId={product.id} />
+        </div>
+        <div className="mt-4">
+          <GenerateImageForm
+            productId={product.id}
+            name={product.name}
+            categoryName={categories.find((c) => c.id === product.categoryId)?.name ?? ""}
+            materials={product.materials}
+          />
         </div>
       </div>
     </div>

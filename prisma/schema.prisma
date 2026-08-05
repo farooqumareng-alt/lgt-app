@@ -40,6 +40,7 @@ model User {
   addresses        Address[]
   wholesaleAccount WholesaleAccount?
   customRequests   CustomRequest[]
+  aiActivityLogs   AiActivityLog[]
 
   @@index([role])
 }
@@ -200,6 +201,10 @@ model ProductImage {
   altText   String
   sortOrder Int     @default(0)
   isPrimary Boolean @default(false)
+  // Tracks AI-generated placeholder photos (vs. real product photography) so
+  // admin can find and swap them out later, and the storefront can flag them
+  // honestly rather than presenting an AI image as the real product shot.
+  isAiGenerated Boolean @default(false)
 
   @@index([productId])
 }
@@ -393,4 +398,18 @@ model CustomRequestImage {
   createdAt       DateTime      @default(now())
 
   @@index([customRequestId])
+}
+
+model AiActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  input     Json
+  output    Json
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([type])
 }
