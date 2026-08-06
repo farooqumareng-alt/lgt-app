@@ -413,3 +413,25 @@ model AiActivityLog {
   @@index([userId])
   @@index([type])
 }
+
+// ── Content / CMS ──────────────────────────────────────
+
+// Admin-editable static pages (About, FAQ, Shipping, Returns, etc.) — a
+// dynamic [slug] route at the top of the retail route group renders these.
+// Content is stored as plain text with blank-line paragraph breaks (no rich
+// text / no dangerouslySetInnerHTML) — simple and has zero XSS surface,
+// matching "treat every input as malicious" for admin-authored content that
+// still passes through a browser render path.
+model ContentPage {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  content         String   @db.Text
+  metaTitle       String?
+  metaDescription String?
+  showInFooter    Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([slug])
+}
