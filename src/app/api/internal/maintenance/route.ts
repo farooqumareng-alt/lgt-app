@@ -20,5 +20,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ deleted: result.count });
   }
 
+  if (action === "list-subscribers") {
+    const rows = await prisma.newsletterSubscriber.findMany();
+    return NextResponse.json({ rows });
+  }
+
   return NextResponse.json({ error: "Unknown action" }, { status: 400 });
 }
