@@ -25,7 +25,15 @@ type AiDashboardProps = {
 };
 
 export function AiDashboard({ userId, recentLogs }: AiDashboardProps) {
-  const [isPending, startTransition] = useTransition();
+  // One useTransition per agent — a single shared pending state meant
+  // clicking any one of the five buttons grayed out all five, which read as
+  // broken/unresponsive on the others.
+  const [seoPending, startSeo] = useTransition();
+  const [pagePending, startPage] = useTransition();
+  const [blogPending, startBlog] = useTransition();
+  const [reportPending, startReport] = useTransition();
+  const [securityPending, startSecurity] = useTransition();
+
   const [seoResult, setSeoResult] = useState<AiSeoAuditResult | null>(null);
   const [pageResult, setPageResult] = useState<AiContentDraft | null>(null);
   const [blogResult, setBlogResult] = useState<AiBlogPostResult | null>(null);
@@ -35,7 +43,7 @@ export function AiDashboard({ userId, recentLogs }: AiDashboardProps) {
 
   function handleSeoAudit() {
     setErrorMessage(null);
-    startTransition(async () => {
+    startSeo(async () => {
       const result = await generateAdminSeoAudit({
         userId,
         pageUrl: "/shop/belts/heritage-full-grain-belt",
@@ -53,7 +61,7 @@ export function AiDashboard({ userId, recentLogs }: AiDashboardProps) {
 
   function handlePageContent() {
     setErrorMessage(null);
-    startTransition(async () => {
+    startPage(async () => {
       const result = await generateAdminPageContent({
         userId,
         pageType: "landing",
@@ -72,7 +80,7 @@ export function AiDashboard({ userId, recentLogs }: AiDashboardProps) {
 
   function handleBlogPost() {
     setErrorMessage(null);
-    startTransition(async () => {
+    startBlog(async () => {
       const result = await generateAdminBlogPost({
         userId,
         topic: "How to care for leather goods",
@@ -90,7 +98,7 @@ export function AiDashboard({ userId, recentLogs }: AiDashboardProps) {
 
   function handleBusinessReport() {
     setErrorMessage(null);
-    startTransition(async () => {
+    startReport(async () => {
       const result = await generateAdminBusinessReport({
         userId,
         focus: "low stock risk across best-selling wallets",
@@ -107,7 +115,7 @@ export function AiDashboard({ userId, recentLogs }: AiDashboardProps) {
 
   function handleSecuritySummary() {
     setErrorMessage(null);
-    startTransition(async () => {
+    startSecurity(async () => {
       const result = await generateAdminSecuritySummary({
         userId,
         area: "admin access and role permissions",
@@ -132,10 +140,10 @@ export function AiDashboard({ userId, recentLogs }: AiDashboardProps) {
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Button variant="secondary" loading={isPending} onClick={handleSeoAudit}>
+            <Button variant="secondary" loading={seoPending} onClick={handleSeoAudit}>
               Run SEO Audit
             </Button>
-            <Button variant="secondary" loading={isPending} onClick={handleBusinessReport}>
+            <Button variant="secondary" loading={reportPending} onClick={handleBusinessReport}>
               Generate Report
             </Button>
           </div>
@@ -144,14 +152,14 @@ export function AiDashboard({ userId, recentLogs }: AiDashboardProps) {
         {errorMessage && <p className="mt-4 text-sm text-rose-700">{errorMessage}</p>}
       </section>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid items-start gap-6 xl:grid-cols-2">
         <Card className="space-y-4 p-6">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-medium text-lg">SEO Agent</h2>
               <p className="text-sm text-ink/70">Keyword research, metadata, schema markup, and page recommendations.</p>
             </div>
-            <Button variant="secondary" loading={isPending} onClick={handleSeoAudit}>
+            <Button variant="secondary" loading={seoPending} onClick={handleSeoAudit}>
               Run Audit
             </Button>
           </div>
@@ -180,7 +188,7 @@ export function AiDashboard({ userId, recentLogs }: AiDashboardProps) {
               <h2 className="font-medium text-lg">Content Agent</h2>
               <p className="text-sm text-ink/70">Create landing pages, blog content, and social media copy instantly.</p>
             </div>
-            <Button variant="secondary" loading={isPending} onClick={handlePageContent}>
+            <Button variant="secondary" loading={pagePending} onClick={handlePageContent}>
               Draft Page
             </Button>
           </div>
@@ -204,14 +212,14 @@ export function AiDashboard({ userId, recentLogs }: AiDashboardProps) {
         </Card>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid items-start gap-6 xl:grid-cols-2">
         <Card className="space-y-4 p-6">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-medium text-lg">SEO Blog Writer</h2>
               <p className="text-sm text-ink/70">Generate a blog outline, introduction, bullets, and SEO metadata.</p>
             </div>
-            <Button variant="secondary" loading={isPending} onClick={handleBlogPost}>
+            <Button variant="secondary" loading={blogPending} onClick={handleBlogPost}>
               Write Blog
             </Button>
           </div>
@@ -247,7 +255,7 @@ export function AiDashboard({ userId, recentLogs }: AiDashboardProps) {
               <p className="text-sm text-ink/70">Run business intelligence and quick security summaries for admin operations.</p>
             </div>
             <div className="flex gap-2">
-              <Button variant="secondary" loading={isPending} onClick={handleSecuritySummary}>
+              <Button variant="secondary" loading={securityPending} onClick={handleSecuritySummary}>
                 Review Security
               </Button>
             </div>

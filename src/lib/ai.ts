@@ -66,7 +66,12 @@ Respond with ONLY a JSON object (no markdown fences, no other text) with exactly
 
   const message = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 1024,
+    max_tokens: 2048,
+    // See src/lib/admin-ai.ts's callAnthropic for why this matters: without
+    // it, Sonnet 5's extended thinking (on by default) can consume the whole
+    // max_tokens budget on invisible reasoning before producing any answer
+    // text, for a task simple enough not to need it.
+    thinking: { type: "disabled" },
     messages: [{ role: "user", content: prompt }],
   });
 

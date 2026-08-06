@@ -25,7 +25,15 @@ async function callAnthropic(prompt: string): Promise<string> {
   const anthropic = getClient();
   const message = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 1024,
+    max_tokens: 2048,
+    // These are short, structured content-generation tasks (return a fixed
+    // set of JSON fields) — no deep reasoning needed. Without this, Sonnet 5's
+    // extended thinking (on by default) can burn the entire max_tokens budget
+    // on invisible thinking tokens before ever producing the answer text,
+    // silently returning nothing. Confirmed directly: with thinking on,
+    // stop_reason came back "max_tokens" with 1023 thinking_tokens and zero
+    // text blocks; disabled, the same prompt returns cleanly in ~15 tokens.
+    thinking: { type: "disabled" },
     messages: [{ role: "user", content: prompt }],
   });
 
@@ -37,12 +45,33 @@ async function callAnthropic(prompt: string): Promise<string> {
   return textBlock.text;
 }
 
+/**
+ * Parses the model's JSON response and defensively normalizes it: every
+ * expected field here is a string (or array of strings) that gets rendered
+ * directly as React children. Models asked for something like "valid
+ * JSON-LD" naturally tend to return an actual nested object for that field
+ * rather than a JSON-encoded string — confirmed directly (schemaMarkup came
+ * back as a real object), which crashes the whole page with "Objects are
+ * not valid as a React child" since nothing here expects to render one. Any
+ * top-level plain-object value gets stringified rather than trusted as-is.
+ */
 function parseJson<T>(text: string): T {
+  let parsed: unknown;
   try {
-    return JSON.parse(stripCodeFence(text));
+    parsed = JSON.parse(stripCodeFence(text));
   } catch {
     throw new Error("AI response was not valid JSON.");
   }
+
+  if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+    for (const [key, value] of Object.entries(parsed as Record<string, unknown>)) {
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        (parsed as Record<string, unknown>)[key] = JSON.stringify(value, null, 2);
+      }
+    }
+  }
+
+  return parsed as T;
 }
 
 export type AiSeoAuditResult = {
