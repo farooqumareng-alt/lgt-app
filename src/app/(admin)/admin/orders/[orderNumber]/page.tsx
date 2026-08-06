@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { OrderStatusForm } from "@/components/admin/order-status-form";
 import { OrderTrackingForm } from "@/components/admin/order-tracking-form";
+import { RefundForm } from "@/components/admin/refund-form";
 import { getOrderForAdmin } from "@/server/repositories/admin-orders";
 
 export const metadata: Metadata = {
@@ -36,6 +37,8 @@ export default async function AdminOrderDetailPage({ params }: Props) {
   if (!order) notFound();
 
   const shipping = order.shippingAddress as ShippingAddress | null;
+  const amountRefunded = Number(order.amountRefunded ?? 0);
+  const amountRemaining = Number(order.grandTotal) - amountRefunded;
 
   return (
     <div className="mx-auto max-w-3xl space-y-8 px-6 py-12">
@@ -72,6 +75,30 @@ export default async function AdminOrderDetailPage({ params }: Props) {
           <a href={order.trackingUrl} className="text-sm text-saddle hover:underline">
             View tracking →
           </a>
+        )}
+      </Card>
+
+      <Card className="space-y-3 p-6">
+        <h2 className="font-medium">Refund</h2>
+        {amountRefunded > 0 && (
+          <p className="text-sm text-ink/70">
+            ${amountRefunded.toFixed(2)} refunded
+            {order.refundedAt &&
+              ` on ${new Date(order.refundedAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`}
+            .
+          </p>
+        )}
+        {order.stripePaymentIntentId ? (
+          amountRemaining > 0 ? (
+            <RefundForm orderId={order.id} remaining={amountRemaining} />
+          ) : (
+            <p className="text-sm text-ink/70">This order has been fully refunded.</p>
+          )
+        ) : (
+          <p className="text-sm text-ink/70">
+            This order has no direct Stripe payment on file (paid via invoice) — issue a refund from the
+            Stripe Dashboard.
+          </p>
         )}
       </Card>
 

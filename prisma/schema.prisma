@@ -320,6 +320,12 @@ model Order {
   shippedAt       DateTime?
   deliveredAt     DateTime?
 
+  // Cumulative — supports partial refunds without a separate ledger table
+  // (a real per-refund audit trail already exists via OrderStatusEvent's
+  // notes, which record each individual refund amount and Stripe refund id).
+  amountRefunded Decimal?  @db.Decimal(10, 2)
+  refundedAt     DateTime?
+
   items         OrderItem[]
   statusHistory OrderStatusEvent[]
 

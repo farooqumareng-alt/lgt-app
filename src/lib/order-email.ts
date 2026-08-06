@@ -197,3 +197,29 @@ export async function sendTrackingUpdateEmail(
     ),
   });
 }
+
+export async function sendRefundEmail(
+  to: string,
+  order: { orderNumber: string; amountRefunded: number; currency: string; isFullRefund: boolean },
+) {
+  const headline = order.isFullRefund ? "Your order has been refunded" : "A partial refund has been issued";
+  const body = order.isFullRefund
+    ? "We've refunded this order in full. Please allow a few business days for it to appear on your statement."
+    : "We've issued a partial refund for this order. Please allow a few business days for it to appear on your statement.";
+
+  await getClient().emails.send({
+    from: FROM_EMAIL,
+    to,
+    subject: `Refund issued — Order ${order.orderNumber}`,
+    html: emailShell(
+      headline,
+      `
+        <p style="margin: 0 0 8px; opacity: 0.8;">Order <strong>${order.orderNumber}</strong></p>
+        <p style="margin: 0 0 16px; opacity: 0.8;">${body}</p>
+        <p style="margin: 0; font-size: 15px; font-weight: bold;">
+          Refund amount: ${formatCurrency(order.amountRefunded, order.currency)}
+        </p>
+      `,
+    ),
+  });
+}
