@@ -28,6 +28,8 @@ function parseProductForm(formData: FormData) {
     shortDescription: formData.get("shortDescription"),
     description: formData.get("description"),
     materials: formData.get("materials"),
+    dimensions: formData.get("dimensions"),
+    careInstructions: formData.get("careInstructions"),
     isCustomizable: formData.get("isCustomizable") === "on",
     isActive: formData.get("isActive") === "on",
     isFeatured: formData.get("isFeatured") === "on",
@@ -66,6 +68,8 @@ export async function createProduct(
       materials: parsed.data.materials
         ? parsed.data.materials.split(",").map((m) => m.trim()).filter(Boolean)
         : [],
+      dimensions: parsed.data.dimensions || null,
+      careInstructions: parsed.data.careInstructions || null,
       isCustomizable: parsed.data.isCustomizable,
       isActive: parsed.data.isActive,
       isFeatured: parsed.data.isFeatured,
@@ -110,6 +114,8 @@ export async function updateProduct(
       materials: parsed.data.materials
         ? parsed.data.materials.split(",").map((m) => m.trim()).filter(Boolean)
         : [],
+      dimensions: parsed.data.dimensions || null,
+      careInstructions: parsed.data.careInstructions || null,
       isCustomizable: parsed.data.isCustomizable,
       isActive: parsed.data.isActive,
       isFeatured: parsed.data.isFeatured,

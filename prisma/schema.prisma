@@ -166,6 +166,14 @@ model Product {
   basePriceRetail  Decimal  @db.Decimal(10, 2)
   basePriceWholesale Decimal? @db.Decimal(10, 2)
   materials        String[]
+  // Free-text, admin-editable — not modeled as structured L/W/H fields since
+  // real product dimensions vary wildly by category (a belt needs a length
+  // range, a bag needs three dimensions, a keychain needs almost none) and a
+  // rigid schema would force awkward workarounds. Same reasoning as
+  // `description`: one flexible field an admin can format however the piece
+  // actually needs, shown as-is on the PDP.
+  dimensions       String?
+  careInstructions String?  @db.Text
   metaTitle        String?
   metaDescription  String?
   createdAt        DateTime @default(now())

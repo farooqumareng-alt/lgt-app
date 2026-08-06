@@ -23,6 +23,8 @@ export const ProductSchema = z.object({
   shortDescription: z.string().trim().max(300).optional().or(z.literal("")),
   description: z.string().trim().min(1, { error: "Description is required." }),
   materials: z.string().trim().optional().or(z.literal("")),
+  dimensions: z.string().trim().max(200).optional().or(z.literal("")),
+  careInstructions: z.string().trim().max(2000).optional().or(z.literal("")),
   isCustomizable: z.boolean().default(false),
   isActive: z.boolean().default(true),
   isFeatured: z.boolean().default(false),

@@ -99,18 +99,23 @@ export async function getProductDetail(categoryUrlSlug: string, slug: string) {
   if (!product) return null;
 
   return {
+    id: product.id,
+    categoryId: product.categoryId,
     slug: product.slug,
     sku: product.sku,
     name: product.name,
     description: product.description,
     shortDescription: product.shortDescription,
     materials: product.materials,
+    dimensions: product.dimensions,
+    careInstructions: product.careInstructions,
     isCustomizable: product.isCustomizable,
     basePrice: Number(product.basePriceRetail),
     metaTitle: product.metaTitle,
     metaDescription: product.metaDescription,
     category: { name: product.category.name, urlSlug: product.category.urlSlug },
     images: product.images.map((image) => ({
+      id: image.id,
       url: image.url,
       altText: image.altText,
       isPrimary: image.isPrimary,
@@ -125,4 +130,18 @@ export async function getProductDetail(categoryUrlSlug: string, slug: string) {
       stockQuantity: variant.stockQuantity,
     })),
   };
+}
+
+// Same category, excluding the product itself — the simplest "related"
+// signal that's actually meaningful here (a belt buyer wants to see other
+// belts, not an arbitrary cross-category pick). Falls back to nothing
+// rendered rather than padding with unrelated products.
+export async function getRelatedProducts(categoryId: string, excludeProductId: string, limit = 4) {
+  const products = await prisma.product.findMany({
+    where: { isActive: true, categoryId, id: { not: excludeProductId } },
+    select: productCardSelect,
+    orderBy: { name: "asc" },
+    take: limit,
+  });
+  return products.map(toCardDto);
 }

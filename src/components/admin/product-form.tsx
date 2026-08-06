@@ -17,6 +17,8 @@ type ProductFormValues = {
   shortDescription?: string | null;
   description?: string;
   materials?: string[];
+  dimensions?: string | null;
+  careInstructions?: string | null;
   isCustomizable?: boolean;
   isActive?: boolean;
   isFeatured?: boolean;
@@ -180,6 +182,34 @@ export function ProductForm({
             defaultValue={defaultValues?.materials?.join(", ") ?? ""}
             placeholder="Full-grain leather, brass hardware"
           />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm font-medium" htmlFor="dimensions">
+            Dimensions (optional)
+          </label>
+          <Input
+            id="dimensions"
+            name="dimensions"
+            defaultValue={defaultValues?.dimensions ?? ""}
+            placeholder='8&quot; W x 4&quot; H x 1&quot; D'
+          />
+          {errors?.dimensions && <p className="text-sm text-saddle-700">{errors.dimensions[0]}</p>}
+        </div>
+
+        <div className="space-y-1 sm:col-span-2">
+          <label className="text-sm font-medium" htmlFor="careInstructions">
+            Care instructions (optional)
+          </label>
+          <textarea
+            id="careInstructions"
+            name="careInstructions"
+            rows={3}
+            defaultValue={defaultValues?.careInstructions ?? ""}
+            placeholder="Condition every 3-6 months. Keep away from prolonged water exposure. Store away from direct sunlight."
+            className="w-full rounded-sm border border-cream-300 bg-cream-50 px-3 py-2 text-sm text-ink focus-visible:border-saddle"
+          />
+          {errors?.careInstructions && <p className="text-sm text-saddle-700">{errors.careInstructions[0]}</p>}
         </div>
 
         <div className="space-y-1">

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/retail/breadcrumbs";
-import { ProductImagePlaceholder } from "@/components/retail/product-image-placeholder";
+import { ProductCard } from "@/components/retail/product-card";
+import { ProductGallery } from "@/components/retail/product-gallery";
 import { VariantSelector } from "@/components/retail/variant-selector";
 import { JsonLd, breadcrumbListJsonLd, productJsonLd } from "@/lib/seo/json-ld";
-import { getProductDetail } from "@/server/repositories/products";
+import { getProductDetail, getRelatedProducts } from "@/server/repositories/products";
 
 export const revalidate = 3600;
 
@@ -36,6 +36,7 @@ export default async function ProductPage({ params }: Props) {
 
   const primaryImage = product.images.find((image) => image.isPrimary) ?? product.images[0];
   const inStock = product.variants.some((variant) => variant.stockQuantity > 0);
+  const relatedProducts = await getRelatedProducts(product.categoryId, product.id);
 
   const breadcrumbItems = [
     { label: "Home", href: "/" },
@@ -62,20 +63,7 @@ export default async function ProductPage({ params }: Props) {
       <Breadcrumbs items={breadcrumbItems} />
 
       <div className="mt-6 grid gap-10 lg:grid-cols-2">
-        <div className="relative aspect-square overflow-hidden rounded-sm border border-cream-200">
-          {primaryImage ? (
-            <Image
-              src={primaryImage.url}
-              alt={primaryImage.altText}
-              fill
-              className="object-cover"
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              priority
-            />
-          ) : (
-            <ProductImagePlaceholder />
-          )}
-        </div>
+        <ProductGallery images={product.images} productName={product.name} />
 
         <div>
           {product.isCustomizable && <Badge variant="outline">Custom Logo Available</Badge>}
@@ -90,15 +78,46 @@ export default async function ProductPage({ params }: Props) {
 
           <div className="mt-8 space-y-4 border-t border-cream-200 pt-6">
             <p className="text-ink/80">{product.description}</p>
-            {product.materials.length > 0 && (
-              <p className="text-sm text-ink/70">
-                <span className="font-medium text-ink">Materials:</span>{" "}
-                {product.materials.join(", ")}
-              </p>
+
+            {(product.materials.length > 0 || product.dimensions) && (
+              <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+                {product.materials.length > 0 && (
+                  <>
+                    <dt className="font-medium text-ink">Materials</dt>
+                    <dd className="text-ink/70">{product.materials.join(", ")}</dd>
+                  </>
+                )}
+                {product.dimensions && (
+                  <>
+                    <dt className="font-medium text-ink">Dimensions</dt>
+                    <dd className="text-ink/70">{product.dimensions}</dd>
+                  </>
+                )}
+              </dl>
+            )}
+
+            {product.careInstructions && (
+              <div>
+                <p className="text-sm font-medium text-ink">Care Instructions</p>
+                <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-ink/70">
+                  {product.careInstructions}
+                </p>
+              </div>
             )}
           </div>
         </div>
       </div>
+
+      {relatedProducts.length > 0 && (
+        <section className="mt-16 border-t border-cream-200 pt-10">
+          <h2 className="font-display text-2xl">You May Also Like</h2>
+          <div className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+            {relatedProducts.map((related) => (
+              <ProductCard key={related.slug} {...related} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
