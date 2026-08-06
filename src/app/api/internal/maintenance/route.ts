@@ -36,5 +36,25 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // Full-repo audit: dump every table's actual columns so they can be diffed
+  // against schema.prisma directly, instead of guessing one table at a time.
+  if (action === "audit") {
+    try {
+      const tables = await prisma.$queryRawUnsafe<{ table_name: string }[]>(
+        "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name",
+      );
+      const result: Record<string, string[]> = {};
+      for (const t of tables) {
+        const cols = await prisma.$queryRawUnsafe<{ column_name: string }[]>(
+          `SELECT column_name FROM information_schema.columns WHERE table_name = '${t.table_name}' ORDER BY ordinal_position`,
+        );
+        result[t.table_name] = cols.map((c) => c.column_name);
+      }
+      return NextResponse.json(result);
+    } catch (error) {
+      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) });
+    }
+  }
+
   return NextResponse.json({ error: "Unknown action" }, { status: 400 });
 }
