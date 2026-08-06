@@ -13,7 +13,14 @@ export const metadata: Metadata = {
 export default async function AdminAiPage() {
   await requireRole("ADMIN");
   const session = await auth();
-  const recentLogs = await getRecentAiActivityLogs(12);
+  let recentLogs: Awaited<ReturnType<typeof getRecentAiActivityLogs>> = [];
+
+  try {
+    recentLogs = await getRecentAiActivityLogs(12);
+  } catch (error) {
+    console.error("Unable to load AI activity logs for admin AI page:", error);
+    recentLogs = [];
+  }
 
   const serializedLogs = recentLogs.map((log) => ({
     ...log,

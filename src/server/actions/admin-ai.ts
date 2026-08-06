@@ -2,6 +2,7 @@
 
 import { requireRole } from "@/lib/dal";
 import { generateListingCopy, type ListingCopy } from "@/lib/ai";
+import type { Prisma } from "@/generated/prisma/client";
 import {
   createAiActivityLog,
 } from "@/server/repositories/admin-ai-logs";
@@ -25,7 +26,13 @@ import {
 export type GenerateListingCopyResult = { success: true; copy: ListingCopy } | { success: false; message: string };
 export type AiActionResult<T> = { success: true; result: T } | { success: false; message: string };
 
-async function auditAndLog<T>(userId: string | undefined, type: string, title: string, input: unknown, getResult: () => Promise<T>): Promise<AiActionResult<T>> {
+async function auditAndLog<T extends Prisma.InputJsonValue>(
+  userId: string | undefined,
+  type: string,
+  title: string,
+  input: Prisma.InputJsonValue,
+  getResult: () => Promise<T>,
+): Promise<AiActionResult<T>> {
   await requireRole("ADMIN");
   try {
     const result = await getResult();

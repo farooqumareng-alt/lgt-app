@@ -10,7 +10,6 @@ import {
   generateAdminBlogPost,
   generateAdminBusinessReport,
   generateAdminSecuritySummary,
-  type AiActionResult,
 } from "@/server/actions/admin-ai";
 import type {
   AiSeoAuditResult,
