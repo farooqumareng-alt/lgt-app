@@ -14,6 +14,9 @@ import {
   generateSecuritySummary,
   generateDeveloperDiagnostics,
   generateCodeReview,
+  generateKeywordResearch,
+  generateSocialMediaDraft,
+  generateAnalyticsSummary,
   type AiSeoAuditResult,
   type AiContentDraft,
   type AiBlogPostResult,
@@ -21,6 +24,9 @@ import {
   type AiSecuritySummaryResult,
   type AiDeveloperDiagnosticResult,
   type AiCodeReviewResult,
+  type AiKeywordResearchResult,
+  type AiSocialMediaDraftResult,
+  type AiAnalyticsSummaryResult,
 } from "@/lib/admin-ai";
 
 export type GenerateListingCopyResult = { success: true; copy: ListingCopy } | { success: false; message: string };
@@ -174,5 +180,44 @@ export async function generateAdminCodeReview(input: {
       codeSnippet: input.codeSnippet,
       focus: input.focus,
     }),
+  );
+}
+
+export async function generateAdminKeywordResearch(input: {
+  userId?: string;
+  topic: string;
+  targetAudience: string;
+  competitorFocus: string;
+}): Promise<AiActionResult<AiKeywordResearchResult>> {
+  return auditAndLog(input.userId, "Keyword Research", input.topic, input, () =>
+    generateKeywordResearch({
+      topic: input.topic,
+      targetAudience: input.targetAudience,
+      competitorFocus: input.competitorFocus,
+    }),
+  );
+}
+
+export async function generateAdminSocialMediaDraft(input: {
+  userId?: string;
+  productOrTopic: string;
+  platform: string;
+  tone: string;
+}): Promise<AiActionResult<AiSocialMediaDraftResult>> {
+  return auditAndLog(input.userId, "Social Media Draft", input.productOrTopic, input, () =>
+    generateSocialMediaDraft({
+      productOrTopic: input.productOrTopic,
+      platform: input.platform,
+      tone: input.tone,
+    }),
+  );
+}
+
+export async function generateAdminAnalyticsSummary(input: {
+  userId?: string;
+  dataSummary: string;
+}): Promise<AiActionResult<AiAnalyticsSummaryResult>> {
+  return auditAndLog(input.userId, "Analytics Summary", "Live business data", input, () =>
+    generateAnalyticsSummary({ dataSummary: input.dataSummary }),
   );
 }

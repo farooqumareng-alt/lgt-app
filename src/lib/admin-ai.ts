@@ -47,13 +47,18 @@ async function callAnthropic(prompt: string): Promise<string> {
 
 /**
  * Parses the model's JSON response and defensively normalizes it: every
- * expected field here is a string (or array of strings) that gets rendered
- * directly as React children. Models asked for something like "valid
- * JSON-LD" naturally tend to return an actual nested object for that field
- * rather than a JSON-encoded string — confirmed directly (schemaMarkup came
- * back as a real object), which crashes the whole page with "Objects are
- * not valid as a React child" since nothing here expects to render one. Any
- * top-level plain-object value gets stringified rather than trusted as-is.
+ * expected field here is a string (or an array of strings, like `bullets`)
+ * that gets rendered directly as React children. Models naturally tend to
+ * return structured objects/arrays-of-objects for fields that read as
+ * "structured" (JSON-LD schema markup, a list of "issues") rather than a
+ * flat string — confirmed twice directly: schemaMarkup came back as a real
+ * object, and separately `issues` came back as an array of
+ * {type, description} objects instead of a string. Either crashes the whole
+ * page with "Objects are not valid as a React child" since nothing here
+ * expects to render one. Never trust the model's exact shape:
+ * - a top-level plain-object value gets stringified
+ * - a top-level array gets stringified UNLESS every element is already a
+ *   string (preserves genuine string arrays like `bullets`)
  */
 function parseJson<T>(text: string): T {
   let parsed: unknown;
@@ -65,7 +70,10 @@ function parseJson<T>(text: string): T {
 
   if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
     for (const [key, value] of Object.entries(parsed as Record<string, unknown>)) {
-      if (value && typeof value === "object" && !Array.isArray(value)) {
+      if (!value || typeof value !== "object") continue;
+
+      const isStringArray = Array.isArray(value) && value.every((item) => typeof item === "string");
+      if (!isStringArray) {
         (parsed as Record<string, unknown>)[key] = JSON.stringify(value, null, 2);
       }
     }
@@ -88,6 +96,25 @@ export type AiContentDraft = {
   body: string;
   metaTitle: string;
   metaDescription: string;
+};
+
+export type AiKeywordResearchResult = {
+  primaryKeywords: string;
+  longTailKeywords: string;
+  searchIntent: string;
+  contentIdeas: string;
+};
+
+export type AiSocialMediaDraftResult = {
+  caption: string;
+  hashtags: string;
+  callToAction: string;
+};
+
+export type AiAnalyticsSummaryResult = {
+  insights: string;
+  trends: string;
+  recommendations: string;
 };
 
 export type AiBlogPostResult = {
@@ -230,4 +257,43 @@ Code snippet:
 ${input.codeSnippet}`;
 
   return parseJson<AiCodeReviewResult>(await callAnthropic(prompt));
+}
+
+export async function generateKeywordResearch(input: {
+  topic: string;
+  targetAudience: string;
+  competitorFocus: string;
+}): Promise<AiKeywordResearchResult> {
+  const prompt = `You are an SEO keyword research specialist for a premium leather goods e-commerce brand.
+Research keyword opportunities for: ${input.topic}.
+Target audience: ${input.targetAudience || "general shoppers"}.
+Competitor angle to consider: ${input.competitorFocus || "none provided"}.
+Return only JSON with keys: primaryKeywords (comma-separated high-intent phrases), longTailKeywords (comma-separated longer phrases), searchIntent (short description of what searchers want), contentIdeas (short list of content/page ideas that could rank, as a single string).`;
+
+  return parseJson<AiKeywordResearchResult>(await callAnthropic(prompt));
+}
+
+export async function generateSocialMediaDraft(input: {
+  productOrTopic: string;
+  platform: string;
+  tone: string;
+}): Promise<AiSocialMediaDraftResult> {
+  const prompt = `You are a social media copywriter for a premium leather goods brand.
+Write a ${input.platform} post about: ${input.productOrTopic}.
+Use a ${input.tone} tone.
+Return only JSON with keys: caption (the post text), hashtags (space-separated hashtags), callToAction (a short closing line).`;
+
+  return parseJson<AiSocialMediaDraftResult>(await callAnthropic(prompt));
+}
+
+export async function generateAnalyticsSummary(input: {
+  dataSummary: string;
+}): Promise<AiAnalyticsSummaryResult> {
+  const prompt = `You are a business intelligence analyst reviewing real, current data for a leather goods e-commerce business.
+Here is the actual current business data snapshot:
+${input.dataSummary}
+
+Analyze this real data (not a hypothetical) and return only JSON with keys: insights (what the numbers show right now), trends (patterns worth watching), recommendations (specific, actionable next steps based on this exact data).`;
+
+  return parseJson<AiAnalyticsSummaryResult>(await callAnthropic(prompt));
 }
