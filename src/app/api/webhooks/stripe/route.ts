@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 
 import { prisma } from "@/lib/prisma";
+import { sendOrderConfirmationEmail, sendOrderEmailSafely, sendOrderStatusEmail } from "@/lib/order-email";
 import { stripe } from "@/lib/stripe";
 import { resolveWholesaleUnitPrice } from "@/server/services/pricing-service";
 
@@ -82,7 +83,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     }),
   );
 
-  await prisma.$transaction(async (tx) => {
+  const { orderNumber, grandTotal, currency } = await prisma.$transaction(async (tx) => {
     const order = await tx.order.create({
       data: {
         orderNumber: session.id, // temporary unique placeholder, replaced below
@@ -106,9 +107,10 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       },
     });
 
+    const finalOrderNumber = `LGT-${100000 + order.orderSequence}`;
     await tx.order.update({
       where: { id: order.id },
-      data: { orderNumber: `LGT-${100000 + order.orderSequence}` },
+      data: { orderNumber: finalOrderNumber },
     });
 
     for (const item of cart.items) {
@@ -119,11 +121,29 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     }
 
     await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
+
+    return { orderNumber: finalOrderNumber, grandTotal: Number(order.grandTotal), currency: order.currency };
   });
+
+  const recipientEmail = session.customer_details?.email;
+  if (recipientEmail) {
+    await sendOrderEmailSafely(() =>
+      sendOrderConfirmationEmail(recipientEmail, {
+        orderNumber,
+        grandTotal,
+        currency,
+        items: itemsData,
+        paymentMethod: "CARD",
+      }),
+    );
+  }
 }
 
 async function handleInvoicePaid(invoice: Stripe.Invoice) {
-  const order = await prisma.order.findUnique({ where: { stripeInvoiceId: invoice.id } });
+  const order = await prisma.order.findUnique({
+    where: { stripeInvoiceId: invoice.id },
+    include: { user: { select: { email: true } } },
+  });
   if (!order) return; // not one of our wholesale invoice orders
   if (order.status === "PAID") return; // already processed — safe no-op for a retried delivery
 
@@ -139,4 +159,10 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
       data: { orderId: order.id, status: "PAID", note: "Invoice paid" },
     }),
   ]);
+
+  if (order.user?.email) {
+    await sendOrderEmailSafely(() =>
+      sendOrderStatusEmail(order.user!.email!, { orderNumber: order.orderNumber, status: "PAID" }),
+    );
+  }
 }

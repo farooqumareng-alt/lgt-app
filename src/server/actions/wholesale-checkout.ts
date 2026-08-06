@@ -5,6 +5,7 @@ import type Stripe from "stripe";
 
 import { requireApprovedWholesaler } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
+import { sendOrderConfirmationEmail, sendOrderEmailSafely } from "@/lib/order-email";
 import { stripe } from "@/lib/stripe";
 import { resolveWholesaleUnitPrice } from "@/server/services/pricing-service";
 import { getOrCreateWholesaleCart } from "@/server/repositories/wholesale-cart";
@@ -213,6 +214,18 @@ export async function createWholesaleInvoiceOrder() {
 
       return created;
     });
+
+    if (session.user.email) {
+      await sendOrderEmailSafely(() =>
+        sendOrderConfirmationEmail(session.user.email!, {
+          orderNumber: order.orderNumber,
+          grandTotal: Number(order.grandTotal),
+          currency: order.currency,
+          items: lines,
+          paymentMethod: "INVOICE",
+        }),
+      );
+    }
 
     redirect(`/wholesale/checkout/success?order=${order.orderNumber}`);
   } catch (error) {
