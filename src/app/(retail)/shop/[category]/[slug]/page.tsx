@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/retail/breadcrumbs";
 import { ProductCard } from "@/components/retail/product-card";
 import { ProductGallery } from "@/components/retail/product-gallery";
+import { ReviewsSection } from "@/components/retail/reviews-section";
+import { StarRating } from "@/components/retail/star-rating";
 import { VariantSelector } from "@/components/retail/variant-selector";
 import { JsonLd, breadcrumbListJsonLd, productJsonLd } from "@/lib/seo/json-ld";
 import { getProductDetail, getRelatedProducts } from "@/server/repositories/products";
+import { getReviewSummary } from "@/server/repositories/reviews";
 
 export const revalidate = 3600;
 
@@ -36,7 +40,10 @@ export default async function ProductPage({ params }: Props) {
 
   const primaryImage = product.images.find((image) => image.isPrimary) ?? product.images[0];
   const inStock = product.variants.some((variant) => variant.stockQuantity > 0);
-  const relatedProducts = await getRelatedProducts(product.categoryId, product.id);
+  const [relatedProducts, reviewSummary] = await Promise.all([
+    getRelatedProducts(product.categoryId, product.id),
+    getReviewSummary(product.id),
+  ]);
 
   const breadcrumbItems = [
     { label: "Home", href: "/" },
@@ -58,6 +65,10 @@ export default async function ProductPage({ params }: Props) {
           price: product.basePrice,
           inStock,
           imageUrl: primaryImage?.url,
+          aggregateRating:
+            reviewSummary.count > 0 && reviewSummary.averageRating !== null
+              ? { averageRating: reviewSummary.averageRating, count: reviewSummary.count }
+              : undefined,
         })}
       />
       <Breadcrumbs items={breadcrumbItems} />
@@ -68,6 +79,15 @@ export default async function ProductPage({ params }: Props) {
         <div>
           {product.isCustomizable && <Badge variant="outline">Custom Logo Available</Badge>}
           <h1 className="mt-2 font-display text-3xl">{product.name}</h1>
+          {reviewSummary.count > 0 && reviewSummary.averageRating !== null && (
+            <Link href="#reviews" className="mt-2 flex items-center gap-2">
+              <StarRating rating={reviewSummary.averageRating} />
+              <span className="text-sm text-ink/70">
+                {reviewSummary.averageRating.toFixed(1)} ({reviewSummary.count} review
+                {reviewSummary.count === 1 ? "" : "s"})
+              </span>
+            </Link>
+          )}
           {product.shortDescription && (
             <p className="mt-2 text-ink/70">{product.shortDescription}</p>
           )}
@@ -107,6 +127,8 @@ export default async function ProductPage({ params }: Props) {
           </div>
         </div>
       </div>
+
+      <ReviewsSection productId={product.id} />
 
       {relatedProducts.length > 0 && (
         <section className="mt-16 border-t border-cream-200 pt-10">

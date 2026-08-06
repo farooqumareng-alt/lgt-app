@@ -41,6 +41,7 @@ export function productJsonLd(product: {
   price: number;
   inStock: boolean;
   imageUrl?: string;
+  aggregateRating?: { averageRating: number; count: number };
 }) {
   return {
     "@context": "https://schema.org",
@@ -59,5 +60,16 @@ export function productJsonLd(product: {
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
     },
+    // Only present once at least one real, approved review exists — never
+    // fabricated to make a new listing look more established than it is.
+    ...(product.aggregateRating
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: product.aggregateRating.averageRating.toFixed(1),
+            reviewCount: product.aggregateRating.count,
+          },
+        }
+      : {}),
   };
 }

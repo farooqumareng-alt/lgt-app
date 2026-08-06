@@ -41,8 +41,33 @@ model User {
   wholesaleAccount WholesaleAccount?
   customRequests   CustomRequest[]
   aiActivityLogs   AiActivityLog[]
+  reviews          Review[]
 
   @@index([role])
+}
+
+// Real customer reviews, not fabricated testimonials — the homepage
+// "Testimonials" section (see getFeaturedReviews) reuses this same table
+// rather than a separate, parallel content type with no real backing data.
+// isApproved gates public visibility (moderation queue); isVerifiedPurchase
+// is computed at submission time from the reviewer's real order history,
+// never self-reported.
+model Review {
+  id                 String   @id @default(cuid())
+  productId          String
+  product            Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating             Int
+  title              String?
+  body               String   @db.Text
+  isVerifiedPurchase Boolean  @default(false)
+  isApproved         Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([productId, userId])
+  @@index([productId, isApproved])
 }
 
 model WholesaleAccount {
@@ -183,6 +208,7 @@ model Product {
   variants       ProductVariant[]
   priceBreaks    WholesalePriceBreak[]
   customRequests CustomRequest[]
+  reviews        Review[]
 
   @@index([categoryId])
   @@index([isActive, isFeatured])

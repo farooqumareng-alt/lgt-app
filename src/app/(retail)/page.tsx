@@ -4,8 +4,10 @@ import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { NewsletterSignupForm } from "@/components/retail/newsletter-signup-form";
 import { ProductCard } from "@/components/retail/product-card";
+import { StarRating } from "@/components/retail/star-rating";
 import { getContentPageBySlug } from "@/server/repositories/admin-content";
 import { getActiveCategories, getFeaturedProducts } from "@/server/repositories/products";
+import { getFeaturedReviews } from "@/server/repositories/reviews";
 
 export const revalidate = 3600;
 
@@ -38,11 +40,12 @@ function firstParagraph(content: string): string {
 }
 
 export default async function HomePage() {
-  const [categories, featuredProducts, ourStoryPage, craftsmanshipPage] = await Promise.all([
+  const [categories, featuredProducts, ourStoryPage, craftsmanshipPage, testimonials] = await Promise.all([
     getActiveCategories(),
     getFeaturedProducts(4),
     getContentPageBySlug("our-story"),
     getContentPageBySlug("craftsmanship"),
+    getFeaturedReviews(3),
   ]);
 
   return (
@@ -102,6 +105,27 @@ export default async function HomePage() {
           <div className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
             {featuredProducts.map((product) => (
               <ProductCard key={product.slug} {...product} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {testimonials.length > 0 && (
+        <section className="mx-auto max-w-6xl px-6 py-12">
+          <h2 className="font-display text-2xl">What Customers Say</h2>
+          <div className="mt-6 grid gap-6 sm:grid-cols-3">
+            {testimonials.map((review) => (
+              <Card key={review.id} stitched className="flex flex-col p-6">
+                <StarRating rating={review.rating} />
+                <p className="mt-3 flex-1 text-sm leading-relaxed text-ink/80">&ldquo;{review.body}&rdquo;</p>
+                <p className="mt-4 text-sm font-medium">{review.user.name ?? "Verified Customer"}</p>
+                <Link
+                  href={`/shop/${review.product.category.urlSlug}/${review.product.slug}`}
+                  className="text-xs text-ink/50 hover:text-saddle"
+                >
+                  {review.product.name}
+                </Link>
+              </Card>
             ))}
           </div>
         </section>
