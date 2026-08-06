@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { sendOrderConfirmationEmail, sendOrderEmailSafely } from "@/lib/order-email";
 import { stripe } from "@/lib/stripe";
 import { resolveWholesaleUnitPrice } from "@/server/services/pricing-service";
+import { getOrCreateWholesaleStripeCustomer } from "@/server/services/wholesale-customer";
 import { getOrCreateWholesaleCart } from "@/server/repositories/wholesale-cart";
 
 const SITE_URL = process.env.AUTH_URL ?? "http://localhost:3000";
@@ -75,6 +76,8 @@ export async function createWholesaleCheckoutSession() {
   }));
 
   try {
+    const stripeCustomerId = await getOrCreateWholesaleStripeCustomer(wholesaleAccount, session.user.email);
+
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: lineItems,
@@ -89,7 +92,8 @@ export async function createWholesaleCheckoutSession() {
         },
       ],
       automatic_tax: { enabled: true },
-      customer_email: session.user.email ?? undefined,
+      customer: stripeCustomerId,
+      customer_update: { name: "auto", address: "auto", shipping: "auto" },
       success_url: `${SITE_URL}/wholesale/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${SITE_URL}/wholesale/checkout`,
       metadata: {
@@ -123,19 +127,7 @@ export async function createWholesaleInvoiceOrder() {
   checkMinimumOrderValue(subtotal, wholesaleAccount.minimumOrderValue);
 
   try {
-    let stripeCustomerId = wholesaleAccount.stripeCustomerId;
-    if (!stripeCustomerId) {
-      const customer = await stripe.customers.create({
-        email: session.user.email ?? undefined,
-        name: wholesaleAccount.businessName,
-        metadata: { wholesaleAccountId: wholesaleAccount.id },
-      });
-      stripeCustomerId = customer.id;
-      await prisma.wholesaleAccount.update({
-        where: { id: wholesaleAccount.id },
-        data: { stripeCustomerId },
-      });
-    }
+    const stripeCustomerId = await getOrCreateWholesaleStripeCustomer(wholesaleAccount, session.user.email);
 
     for (const line of lines) {
       await stripe.invoiceItems.create({

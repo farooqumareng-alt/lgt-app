@@ -75,8 +75,18 @@ model WholesaleAccount {
   userId            String                  @unique
   user              User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   businessName      String
+  // Nullable at the DB level — a handful of accounts were approved before
+  // this became a required application field, and existing rows shouldn't
+  // retroactively break. New applications enforce it required at the
+  // validation layer (see WholesaleApplicationSchema); its presence also
+  // drives real Stripe tax-exempt status, not just a copy claim — see
+  // src/server/services/wholesale-customer.ts.
   taxId             String?
   phone             String
+  website           String?
+  storeType         String?
+  ein               String?
+  businessAddress   Json?
   applicationNote   String?                 @db.Text
   approvalStatus    WholesaleApprovalStatus @default(PENDING)
   netTermsDays      Int?
@@ -177,32 +187,32 @@ model Category {
 }
 
 model Product {
-  id               String   @id @default(cuid())
-  slug             String   @unique
-  sku              String   @unique
-  categoryId       String
-  category         Category @relation(fields: [categoryId], references: [id])
-  name             String
-  shortDescription String?
-  description      String   @db.Text
-  isCustomizable   Boolean  @default(false)
-  isActive         Boolean  @default(true)
-  isFeatured       Boolean  @default(false)
-  basePriceRetail  Decimal  @db.Decimal(10, 2)
+  id                 String   @id @default(cuid())
+  slug               String   @unique
+  sku                String   @unique
+  categoryId         String
+  category           Category @relation(fields: [categoryId], references: [id])
+  name               String
+  shortDescription   String?
+  description        String   @db.Text
+  isCustomizable     Boolean  @default(false)
+  isActive           Boolean  @default(true)
+  isFeatured         Boolean  @default(false)
+  basePriceRetail    Decimal  @db.Decimal(10, 2)
   basePriceWholesale Decimal? @db.Decimal(10, 2)
-  materials        String[]
+  materials          String[]
   // Free-text, admin-editable — not modeled as structured L/W/H fields since
   // real product dimensions vary wildly by category (a belt needs a length
   // range, a bag needs three dimensions, a keychain needs almost none) and a
   // rigid schema would force awkward workarounds. Same reasoning as
   // `description`: one flexible field an admin can format however the piece
   // actually needs, shown as-is on the PDP.
-  dimensions       String?
-  careInstructions String?  @db.Text
-  metaTitle        String?
-  metaDescription  String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  dimensions         String?
+  careInstructions   String?  @db.Text
+  metaTitle          String?
+  metaDescription    String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   images         ProductImage[]
   variants       ProductVariant[]
@@ -228,13 +238,13 @@ model WholesalePriceBreak {
 }
 
 model ProductImage {
-  id        String  @id @default(cuid())
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  url       String
-  altText   String
-  sortOrder Int     @default(0)
-  isPrimary Boolean @default(false)
+  id            String  @id @default(cuid())
+  productId     String
+  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url           String
+  altText       String
+  sortOrder     Int     @default(0)
+  isPrimary     Boolean @default(false)
   // Tracks AI-generated placeholder photos (vs. real product photography) so
   // admin can find and swap them out later, and the storefront can flag them
   // honestly rather than presenting an AI image as the real product shot.
@@ -244,9 +254,9 @@ model ProductImage {
 }
 
 model ProductVariant {
-  id                  String   @id @default(cuid())
-  productId           String
-  product             Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id                     String   @id @default(cuid())
+  productId              String
+  product                Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   sku                    String   @unique
   color                  String?
   size                   String?
@@ -316,17 +326,17 @@ enum OrderPaymentMethod {
 }
 
 model Order {
-  id                 String              @id @default(cuid())
-  orderSequence      Int                 @default(autoincrement())
-  orderNumber        String              @unique
+  id                 String             @id @default(cuid())
+  orderSequence      Int                @default(autoincrement())
+  orderNumber        String             @unique
   userId             String?
-  user               User?               @relation(fields: [userId], references: [id])
+  user               User?              @relation(fields: [userId], references: [id])
   guestEmail         String?
-  status             OrderStatus         @default(PAID)
-  channel            OrderChannel        @default(RETAIL)
-  paymentMethod      OrderPaymentMethod  @default(CARD)
+  status             OrderStatus        @default(PAID)
+  channel            OrderChannel       @default(RETAIL)
+  paymentMethod      OrderPaymentMethod @default(CARD)
   wholesaleAccountId String?
-  wholesaleAccount   WholesaleAccount?   @relation(fields: [wholesaleAccountId], references: [id])
+  wholesaleAccount   WholesaleAccount?  @relation(fields: [wholesaleAccountId], references: [id])
 
   subtotal      Decimal @db.Decimal(10, 2)
   shippingTotal Decimal @db.Decimal(10, 2)
@@ -402,19 +412,19 @@ enum CustomRequestStatus {
 }
 
 model CustomRequest {
-  id      String  @id @default(cuid())
-  userId  String?
-  user    User?   @relation(fields: [userId], references: [id])
-  name    String
-  email   String
-  phone   String?
+  id     String  @id @default(cuid())
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+  name   String
+  email  String
+  phone  String?
 
   // Optional link to a product the customer saw on /custom — not required,
   // since fully bespoke requests with no matching product are expected too.
   productId String?
   product   Product? @relation(fields: [productId], references: [id])
 
-  description String  @db.Text
+  description String               @db.Text
   budget      String?
   images      CustomRequestImage[]
 

@@ -31,10 +31,3 @@ export const ChangePasswordSchema = z
       .regex(/[a-zA-Z]/, { error: "Password must contain a letter." })
       .regex(/[0-9]/, { error: "Password must contain a number." }),
   });
-
-export const WholesaleApplicationSchema = z.object({
-  businessName: z.string().trim().min(2, { error: "Business name is required." }),
-  taxId: z.string().trim().optional().or(z.literal("")),
-  phone: z.string().trim().min(7, { error: "A phone number is required." }),
-  applicationNote: z.string().trim().max(2000).optional().or(z.literal("")),
-});
