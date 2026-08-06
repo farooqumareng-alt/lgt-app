@@ -435,3 +435,15 @@ model ContentPage {
 
   @@index([slug])
 }
+
+// Homepage newsletter signup. Deliberately just a capture table for now — no
+// campaign-sending infrastructure exists (that would mean a real email
+// marketing integration, e.g. Resend Broadcasts or a dedicated ESP, which is
+// out of scope here). This makes the signup form genuinely functional
+// (real rows, real duplicate-email handling) without pretending a "Sign up
+// for our newsletter" promise is backed by campaigns that don't exist yet.
+model NewsletterSubscriber {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  subscribedAt DateTime @default(now())
+}
