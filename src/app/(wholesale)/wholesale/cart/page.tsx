@@ -13,10 +13,10 @@ export const metadata: Metadata = {
 export default async function WholesaleCartPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; min?: string }>;
+  searchParams: Promise<{ error?: string; min?: string; reordered?: string; count?: string; of?: string }>;
 }) {
   const { wholesaleAccount } = await requireApprovedWholesaler();
-  const { error, min } = await searchParams;
+  const { error, min, reordered, count, of } = await searchParams;
   const cart = await getOrCreateWholesaleCart();
   const items = await cartItemDtos(cart);
   const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
@@ -37,6 +37,16 @@ export default async function WholesaleCartPage({
       {error === "minimum" && (
         <p className="mt-4 rounded-sm border border-saddle-700 bg-saddle-50 p-4 text-sm text-saddle-700">
           Your order must be at least ${Number(min).toFixed(2)} to check out.
+        </p>
+      )}
+      {reordered === "full" && (
+        <p className="mt-4 rounded-sm border border-cream-200 bg-cream-50 p-4 text-sm text-ink/70">
+          Added {count} item{count === "1" ? "" : "s"} from your past order to the cart.
+        </p>
+      )}
+      {reordered === "partial" && (
+        <p className="mt-4 rounded-sm border border-saddle-700 bg-saddle-50 p-4 text-sm text-saddle-700">
+          Added {count} of {of} items from your past order — the rest are no longer available.
         </p>
       )}
 

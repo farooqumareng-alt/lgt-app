@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 
 import { requireApprovedWholesaler } from "@/lib/dal";
 import { OrderStatusBadge } from "@/components/retail/order-status-badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getOrderDetail } from "@/server/repositories/orders";
+import { reorderWholesaleOrder } from "@/server/actions/wholesale-cart";
 import { stripe } from "@/lib/stripe";
 
 export const metadata: Metadata = {
@@ -12,10 +14,14 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-type Props = { params: Promise<{ orderNumber: string }> };
+type Props = {
+  params: Promise<{ orderNumber: string }>;
+  searchParams: Promise<{ reorder?: string }>;
+};
 
-export default async function WholesaleOrderDetailPage({ params }: Props) {
+export default async function WholesaleOrderDetailPage({ params, searchParams }: Props) {
   const { orderNumber } = await params;
+  const { reorder } = await searchParams;
   const { session } = await requireApprovedWholesaler();
   const order = await getOrderDetail(session.user.id, orderNumber);
 
@@ -40,8 +46,22 @@ export default async function WholesaleOrderDetailPage({ params }: Props) {
             })}
           </p>
         </div>
-        <OrderStatusBadge status={order.status} />
+        <div className="flex items-center gap-3">
+          <form action={reorderWholesaleOrder.bind(null, order.orderNumber)}>
+            <Button type="submit" variant="secondary">
+              Reorder
+            </Button>
+          </form>
+          <OrderStatusBadge status={order.status} />
+        </div>
       </div>
+
+      {reorder === "failed" && (
+        <p className="mt-4 rounded-sm border border-saddle-700 bg-saddle-50 p-4 text-sm text-saddle-700">
+          None of these items could be re-added — they may no longer be wholesale-enabled or in
+          stock.
+        </p>
+      )}
 
       {hostedInvoiceUrl && (
         <Card className="mt-6 p-4">

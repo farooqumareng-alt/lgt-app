@@ -11,6 +11,13 @@ export function getOrdersForUser(userId: string, channel?: OrderChannel) {
   });
 }
 
+export function getInvoicedOrdersForUser(userId: string) {
+  return prisma.order.findMany({
+    where: { userId, channel: "WHOLESALE", paymentMethod: "INVOICE" },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
 export function getRecentOrdersForUser(userId: string, limit = 3) {
   return prisma.order.findMany({
     where: { userId },

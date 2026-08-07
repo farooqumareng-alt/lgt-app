@@ -92,12 +92,20 @@ export default async function WholesaleAccountPage() {
         </dl>
       </Card>
 
-      <div className="mt-6 flex gap-4 text-sm">
+      <div className="mt-6 flex flex-wrap gap-4 text-sm">
         <Link href="/wholesale/shop" className="text-saddle hover:underline">
           Wholesale Shop
         </Link>
         <Link href="/wholesale/orders" className="text-saddle hover:underline">
           Order History
+        </Link>
+        {wholesaleAccount.netTermsDays && (
+          <Link href="/wholesale/invoices" className="text-saddle hover:underline">
+            Invoices
+          </Link>
+        )}
+        <Link href="/wholesale/catalog" className="text-saddle hover:underline">
+          Download Catalog (CSV)
         </Link>
       </div>
     </div>

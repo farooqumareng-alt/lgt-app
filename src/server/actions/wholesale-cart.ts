@@ -1,9 +1,12 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
+import { requireApprovedWholesaler } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { getOrCreateWholesaleCart } from "@/server/repositories/wholesale-cart";
+import { getOrderDetail } from "@/server/repositories/orders";
 
 export type WholesaleCartActionResult = { success: true } | { success: false; error: string };
 export type BulkAddResult =
@@ -111,4 +114,29 @@ export async function bulkAddToWholesaleCart(rows: { sku: string; quantity: numb
     return { success: false, error: "None of the rows could be added — check SKUs and stock.", skippedSkus };
   }
   return { success: true, addedCount };
+}
+
+// Rebuilds cart lines from a past order's real snapshotted items (by SKU),
+// re-validating current stock/active/wholesale-enabled status the same way
+// bulkAddToWholesaleCart already does for CSV/grid input — a reorder is
+// just another source of {sku, quantity} rows, never a shortcut around
+// those checks.
+export async function reorderWholesaleOrder(orderNumber: string) {
+  const { session } = await requireApprovedWholesaler();
+  const order = await getOrderDetail(session.user.id, orderNumber);
+
+  if (!order || order.channel !== "WHOLESALE") {
+    redirect(`/wholesale/orders/${orderNumber}?reorder=notfound`);
+  }
+
+  const rows = order.items.map((item) => ({ sku: item.skuSnapshot, quantity: item.quantity }));
+  const result = await bulkAddToWholesaleCart(rows);
+
+  if (!result.success) {
+    redirect(`/wholesale/orders/${orderNumber}?reorder=failed`);
+  }
+  if (result.addedCount < rows.length) {
+    redirect(`/wholesale/cart?reordered=partial&count=${result.addedCount}&of=${rows.length}`);
+  }
+  redirect(`/wholesale/cart?reordered=full&count=${result.addedCount}`);
 }
