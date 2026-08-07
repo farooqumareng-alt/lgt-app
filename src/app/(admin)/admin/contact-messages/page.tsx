@@ -5,7 +5,8 @@ import { requireRole } from "@/lib/dal";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { toggleContactMessageResolved } from "@/server/actions/admin-contact-messages";
+import { DeleteWithConfirmButton } from "@/components/admin/delete-with-confirm-button";
+import { deleteContactMessage, toggleContactMessageResolved } from "@/server/actions/admin-contact-messages";
 import { getAllContactMessagesForAdmin } from "@/server/repositories/admin-contact-messages";
 
 export const metadata: Metadata = {
@@ -67,11 +68,17 @@ export default async function AdminContactMessagesPage({ searchParams }: Props) 
                   })}
                 </p>
               </div>
-              <form action={toggleContactMessageResolved.bind(null, message.id)}>
-                <SubmitButton pendingLabel="Saving…" variant="secondary">
-                  {message.isResolved ? "Reopen" : "Mark Resolved"}
-                </SubmitButton>
-              </form>
+              <div className="flex shrink-0 flex-col items-end gap-2">
+                <form action={toggleContactMessageResolved.bind(null, message.id)}>
+                  <SubmitButton pendingLabel="Saving…" variant="secondary">
+                    {message.isResolved ? "Reopen" : "Mark Resolved"}
+                  </SubmitButton>
+                </form>
+                <DeleteWithConfirmButton
+                  action={deleteContactMessage.bind(null, message.id)}
+                  confirmMessage={`Delete this message from ${message.name}?`}
+                />
+              </div>
             </div>
           </Card>
         ))}

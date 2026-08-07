@@ -47,9 +47,20 @@ export default async function RetailLayout({ children }: { children: React.React
               </div>
             )}
           </div>
-          <p className="mt-10 border-t border-cream-200 pt-6 text-center text-sm text-ink/60">
-            © {new Date().getFullYear()} Leather Goods Texas
-          </p>
+          <div className="mt-10 border-t border-cream-200 pt-6 text-center text-sm text-ink/60">
+            <p>© {new Date().getFullYear()} Leather Goods Texas</p>
+            <p className="mt-1 text-xs">
+              Developed and designed by{" "}
+              <a
+                href="https://www.fixvise.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-saddle hover:underline"
+              >
+                www.fixvise.com
+              </a>
+            </p>
+          </div>
         </div>
       </footer>
     </div>

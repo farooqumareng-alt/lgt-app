@@ -4,8 +4,10 @@ import { notFound } from "next/navigation";
 
 import { requireRole } from "@/lib/dal";
 import { CustomRequestStatusForm } from "@/components/admin/custom-request-status-form";
+import { DeleteWithConfirmButton } from "@/components/admin/delete-with-confirm-button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { deleteCustomRequest } from "@/server/actions/admin-custom-requests";
 import { getCustomRequestForAdmin } from "@/server/repositories/admin-custom-requests";
 
 export const metadata: Metadata = {
@@ -90,8 +92,12 @@ export default async function AdminCustomRequestDetailPage({ params }: { params:
         </Card>
       )}
 
-      <div className="mt-6">
+      <div className="mt-6 flex items-center justify-between">
         <CustomRequestStatusForm id={request.id} currentStatus={request.status} />
+        <DeleteWithConfirmButton
+          action={deleteCustomRequest.bind(null, request.id)}
+          confirmMessage={`Delete this custom request from ${request.name}? This cannot be undone.`}
+        />
       </div>
     </div>
   );

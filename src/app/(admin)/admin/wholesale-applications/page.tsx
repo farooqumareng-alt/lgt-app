@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { requireRole } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Card } from "@/components/ui/card";
-import { approveWholesaleAccount, rejectWholesaleAccount } from "@/server/actions/wholesale-admin";
+import {
+  approveWholesaleAccount,
+  rejectWholesaleAccount,
+  suspendWholesaleAccount,
+  reactivateWholesaleAccount,
+} from "@/server/actions/wholesale-admin";
 
 export const metadata: Metadata = {
   title: "Wholesale Applications",
@@ -40,7 +46,9 @@ export default async function WholesaleApplicationsPage() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="font-medium">
-                    {account.businessName}
+                    <Link href={`/admin/wholesale-applications/${account.id}`} className="hover:text-saddle hover:underline">
+                      {account.businessName}
+                    </Link>
                     {account.storeType && <span className="ml-2 text-xs font-normal text-ink/50">{account.storeType}</span>}
                   </p>
                   <p className="text-sm text-ink/70">
@@ -64,18 +72,37 @@ export default async function WholesaleApplicationsPage() {
                     {account.approvalStatus}
                   </p>
                 </div>
-                {account.approvalStatus === "PENDING" && (
-                  <div className="flex shrink-0 gap-2">
-                    <form action={approveWholesaleAccount.bind(null, account.id)}>
-                      <SubmitButton pendingLabel="Approving…">Approve</SubmitButton>
-                    </form>
-                    <form action={rejectWholesaleAccount.bind(null, account.id)}>
-                      <SubmitButton pendingLabel="Rejecting…" variant="secondary">
-                        Reject
+                <div className="flex shrink-0 flex-col items-end gap-2">
+                  {account.approvalStatus === "PENDING" && (
+                    <div className="flex gap-2">
+                      <form action={approveWholesaleAccount.bind(null, account.id)}>
+                        <SubmitButton pendingLabel="Approving…">Approve</SubmitButton>
+                      </form>
+                      <form action={rejectWholesaleAccount.bind(null, account.id)}>
+                        <SubmitButton pendingLabel="Rejecting…" variant="secondary">
+                          Reject
+                        </SubmitButton>
+                      </form>
+                    </div>
+                  )}
+                  {account.approvalStatus === "APPROVED" && (
+                    <form action={suspendWholesaleAccount.bind(null, account.id)}>
+                      <SubmitButton pendingLabel="Suspending…" variant="secondary">
+                        Suspend
                       </SubmitButton>
                     </form>
-                  </div>
-                )}
+                  )}
+                  {account.approvalStatus === "SUSPENDED" && (
+                    <form action={reactivateWholesaleAccount.bind(null, account.id)}>
+                      <SubmitButton pendingLabel="Reactivating…" variant="secondary">
+                        Reactivate
+                      </SubmitButton>
+                    </form>
+                  )}
+                  <Link href={`/admin/wholesale-applications/${account.id}`} className="text-xs text-saddle hover:underline">
+                    Edit Terms
+                  </Link>
+                </div>
               </div>
             </Card>
           );

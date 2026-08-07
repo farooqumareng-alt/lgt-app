@@ -13,3 +13,11 @@ export async function toggleContactMessageResolved(id: string) {
   await prisma.contactMessage.update({ where: { id }, data: { isResolved: !message.isResolved } });
   revalidatePath("/admin/contact-messages");
 }
+
+// Nothing else references a ContactMessage — a real hard delete, useful for
+// clearing spam.
+export async function deleteContactMessage(id: string) {
+  await requireRole("ADMIN");
+  await prisma.contactMessage.delete({ where: { id } }).catch(() => {});
+  revalidatePath("/admin/contact-messages");
+}
