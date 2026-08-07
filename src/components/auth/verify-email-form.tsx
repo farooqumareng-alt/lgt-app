@@ -6,7 +6,7 @@ import { resendVerificationCode, verifyEmail } from "@/server/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function VerifyEmailForm({ email }: { email: string }) {
+export function VerifyEmailForm({ email, next }: { email: string; next?: string }) {
   const [state, formAction, pending] = useActionState(verifyEmail, undefined);
   const [isResending, startResend] = useTransition();
   const [resendMessage, setResendMessage] = useState<string | null>(null);
@@ -22,6 +22,7 @@ export function VerifyEmailForm({ email }: { email: string }) {
     <div className="space-y-4">
       <form action={formAction} className="space-y-4">
         <input type="hidden" name="email" value={email} />
+        {next && <input type="hidden" name="next" value={next} />}
         <div className="space-y-1">
           <label htmlFor="code" className="text-sm font-medium">
             Verification code

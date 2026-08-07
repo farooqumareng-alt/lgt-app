@@ -7,12 +7,13 @@ import { login } from "@/server/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function LoginForm() {
+export function LoginForm({ next }: { next?: string }) {
   const [state, formAction, pending] = useActionState(login, undefined);
   const [email, setEmail] = useState("");
 
   return (
     <form action={formAction} className="space-y-4">
+      {next && <input type="hidden" name="next" value={next} />}
       <div className="space-y-1">
         <label htmlFor="email" className="text-sm font-medium">
           Email
@@ -53,7 +54,10 @@ export function LoginForm() {
           {state.needsVerification && (
             <>
               {" "}
-              <Link href={`/verify-email?email=${encodeURIComponent(email)}`} className="underline">
+              <Link
+                href={`/verify-email?email=${encodeURIComponent(email)}${next ? `&next=${encodeURIComponent(next)}` : ""}`}
+                className="underline"
+              >
                 Verify now
               </Link>
             </>

@@ -8,10 +8,10 @@ export const metadata: Metadata = {
   title: "Sign In",
 };
 
-type Props = { searchParams: Promise<{ verified?: string }> };
+type Props = { searchParams: Promise<{ verified?: string; next?: string }> };
 
 export default async function LoginPage({ searchParams }: Props) {
-  const { verified } = await searchParams;
+  const { verified, next } = await searchParams;
 
   return (
     <Card className="p-8 shadow-sm sm:p-10">
@@ -25,10 +25,13 @@ export default async function LoginPage({ searchParams }: Props) {
             Email verified — you can sign in now.
           </p>
         )}
-        <LoginForm />
+        <LoginForm next={next} />
         <p className="text-center text-sm text-ink/70">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-medium text-saddle hover:underline">
+          <Link
+            href={next ? `/register?next=${encodeURIComponent(next)}` : "/register"}
+            className="font-medium text-saddle hover:underline"
+          >
             Create one
           </Link>
         </p>

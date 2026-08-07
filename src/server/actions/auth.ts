@@ -14,6 +14,16 @@ export type FormState =
   | { errors?: Record<string, string[]>; message?: string; needsVerification?: boolean }
   | undefined;
 
+// Only ever a same-origin relative path — the `next` param is untrusted user
+// input (it round-trips through a query string), so anything that could be
+// interpreted as an external URL (a scheme, or `//host` protocol-relative)
+// is rejected rather than handed to signIn's redirectTo, which would
+// otherwise make this an open-redirect vector.
+function safeNextPath(next: FormDataEntryValue | null): string | null {
+  if (typeof next !== "string" || !next.startsWith("/") || next.startsWith("//")) return null;
+  return next;
+}
+
 export async function login(_prevState: FormState, formData: FormData): Promise<FormState> {
   const parsed = LoginSchema.safeParse({
     email: formData.get("email"),
@@ -32,11 +42,13 @@ export async function login(_prevState: FormState, formData: FormData): Promise<
     };
   }
 
+  const next = safeNextPath(formData.get("next"));
+
   try {
     await signIn("credentials", {
       email: parsed.data.email,
       password: parsed.data.password,
-      redirectTo: user?.role === "ADMIN" ? "/admin" : "/account",
+      redirectTo: user?.role === "ADMIN" ? "/admin" : (next ?? "/account"),
     });
   } catch (error) {
     if (error instanceof AuthError) {
@@ -80,7 +92,13 @@ export async function register(_prevState: FormState, formData: FormData): Promi
     console.error("sendVerificationEmail failed during registration:", error);
   }
 
-  redirect(`/verify-email?email=${encodeURIComponent(email)}`);
+  // Carries a caller-supplied destination (e.g. "start a wholesale
+  // application") through the whole register → verify → login chain, so
+  // arriving via /register?next=/wholesale/apply actually lands there
+  // instead of the generic /account after signing in.
+  const next = safeNextPath(formData.get("next"));
+  const nextParam = next ? `&next=${encodeURIComponent(next)}` : "";
+  redirect(`/verify-email?email=${encodeURIComponent(email)}${nextParam}`);
 }
 
 export type VerifyEmailState =
@@ -115,7 +133,9 @@ export async function verifyEmail(
     data: { userId: user.id, guestEmail: null },
   });
 
-  redirect("/login?verified=1");
+  const next = safeNextPath(formData.get("next"));
+  const nextParam = next ? `&next=${encodeURIComponent(next)}` : "";
+  redirect(`/login?verified=1${nextParam}`);
 }
 
 export type ResendState = { message: string } | undefined;

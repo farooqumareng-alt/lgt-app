@@ -9,10 +9,10 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-type Props = { searchParams: Promise<{ email?: string }> };
+type Props = { searchParams: Promise<{ email?: string; next?: string }> };
 
 export default async function VerifyEmailPage({ searchParams }: Props) {
-  const { email } = await searchParams;
+  const { email, next } = await searchParams;
   if (!email) redirect("/register");
 
   return (
@@ -24,7 +24,7 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
             We sent a 6-digit code to <span className="font-medium text-ink">{email}</span>
           </p>
         </div>
-        <VerifyEmailForm email={email} />
+        <VerifyEmailForm email={email} next={next} />
       </div>
     </Card>
   );
