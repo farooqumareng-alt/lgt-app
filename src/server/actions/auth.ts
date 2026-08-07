@@ -44,11 +44,25 @@ export async function login(_prevState: FormState, formData: FormData): Promise<
 
   const next = safeNextPath(formData.get("next"));
 
+  // An explicit `next` (e.g. arriving via /login?next=/wholesale/apply)
+  // always wins over the role-based default — it means the visitor was
+  // headed somewhere specific before being asked to sign in. Admins are the
+  // one exception: /admin is where an admin account belongs regardless of
+  // how they got to the login page. Wholesalers otherwise land on their own
+  // portal home instead of the generic retail /account, which previously
+  // sent every non-admin there with no regard for role.
+  let redirectTo = next ?? "/account";
+  if (user?.role === "ADMIN") {
+    redirectTo = "/admin";
+  } else if (!next && user?.role === "WHOLESALER") {
+    redirectTo = "/wholesale/account";
+  }
+
   try {
     await signIn("credentials", {
       email: parsed.data.email,
       password: parsed.data.password,
-      redirectTo: user?.role === "ADMIN" ? "/admin" : (next ?? "/account"),
+      redirectTo,
     });
   } catch (error) {
     if (error instanceof AuthError) {
