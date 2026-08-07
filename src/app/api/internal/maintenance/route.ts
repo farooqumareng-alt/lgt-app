@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       create: {
         name: "Deep Test Wholesaler",
         email: "deep-test-wholesaler@lgt-test-account.invalid",
-        passwordHash: "$2b$10$GJblQ.qvZjUUzMKm8SXjZ.eAzZ/2Wv5v5qoK00wnPbWa2CRxbMD.G",
+        passwordHash: "$2b$10$WoyjxYac7fv8SXTxeYgZY.XZALNbFdLeG3qgW4TtPqMTlb8/EBYrq",
         role: "WHOLESALER",
         emailVerified: new Date(),
       },
