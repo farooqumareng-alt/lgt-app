@@ -45,6 +45,89 @@ function stripCodeFence(text: string): string {
   return fenced ? fenced[1] : trimmed;
 }
 
+export type ProductImageAnalysisInput = {
+  imageUrl: string;
+  productName?: string;
+  categoryName?: string;
+};
+
+export type ProductImageAnalysis = {
+  shortDescription: string;
+  description: string;
+  suggestedMaterials: string;
+  imageFeedback: string;
+};
+
+// Claude Sonnet 5 is multimodal — this passes the image straight through by
+// URL (our product photos are already public Vercel Blob URLs, so no need
+// to fetch and re-encode as base64). Still returns a suggestion, never
+// applies anything itself — the admin reviews and fills the form, same
+// "suggest, human applies" boundary as every other AI tool in this admin
+// panel.
+export async function analyzeProductImage(input: ProductImageAnalysisInput): Promise<ProductImageAnalysis> {
+  const anthropic = getClient();
+
+  const prompt = `${BRAND_VOICE}
+
+Look at this product photo${input.productName ? ` of "${input.productName}"` : ""}${
+    input.categoryName ? ` (category: ${input.categoryName})` : ""
+  } and do two separate things:
+
+1. Write listing copy based on what you actually see in the photo — color, hardware, stitching,
+   texture, and any other visible details. Don't invent details you can't see.
+2. Give brief, honest feedback on the PHOTO ITSELF as an e-commerce product image — lighting,
+   background, framing, and whether it looks professional enough for a live product page. If it
+   already looks good, say so plainly rather than inventing a problem.
+
+Respond with ONLY a JSON object (no markdown fences, no other text) with exactly these keys:
+{
+  "shortDescription": "one sentence, under 150 characters, for product grid cards",
+  "description": "2-3 sentences, the full product page description, based on what's visible",
+  "suggestedMaterials": "comma-separated list of materials/hardware visible in the photo",
+  "imageFeedback": "2-3 sentences of honest, actionable feedback on the photo's lighting, background, and framing"
+}`;
+
+  const message = await anthropic.messages.create({
+    model: MODEL,
+    max_tokens: 2048,
+    thinking: { type: "disabled" },
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "image", source: { type: "url", url: input.imageUrl } },
+          { type: "text", text: prompt },
+        ],
+      },
+    ],
+  });
+
+  const textBlock = message.content.find((block) => block.type === "text");
+  if (!textBlock || textBlock.type !== "text") {
+    throw new Error("No text response from the AI model.");
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(stripCodeFence(textBlock.text));
+  } catch {
+    throw new Error("AI response was not valid JSON.");
+  }
+
+  if (
+    !parsed ||
+    typeof parsed !== "object" ||
+    typeof (parsed as ProductImageAnalysis).shortDescription !== "string" ||
+    typeof (parsed as ProductImageAnalysis).description !== "string" ||
+    typeof (parsed as ProductImageAnalysis).suggestedMaterials !== "string" ||
+    typeof (parsed as ProductImageAnalysis).imageFeedback !== "string"
+  ) {
+    throw new Error("AI response was missing expected fields.");
+  }
+
+  return parsed as ProductImageAnalysis;
+}
+
 export async function generateListingCopy(input: ListingCopyInput): Promise<ListingCopy> {
   const anthropic = getClient();
 

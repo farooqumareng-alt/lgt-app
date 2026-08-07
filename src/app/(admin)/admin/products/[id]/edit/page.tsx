@@ -39,6 +39,7 @@ export default async function EditProductPage({ params }: Props) {
         <ProductForm
           action={updateProduct.bind(null, product.id)}
           categories={categories}
+          productImages={product.images.map((image) => ({ url: image.url, altText: image.altText }))}
           defaultValues={{
             name: product.name,
             slug: product.slug,

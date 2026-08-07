@@ -5,9 +5,10 @@ import { useActionState, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { ProductActionResult } from "@/server/actions/admin-products";
-import { generateProductListingCopy } from "@/server/actions/admin-ai";
+import { generateAdminProductImageAnalysis, generateProductListingCopy } from "@/server/actions/admin-ai";
 
 type Category = { id: string; name: string };
+type ProductImageRef = { url: string; altText: string };
 
 type ProductFormValues = {
   name?: string;
@@ -38,11 +39,14 @@ export function ProductForm({
   categories,
   defaultValues,
   submitLabel = "Save Product",
+  productImages = [],
 }: {
   action: ProductFormAction;
   categories: Category[];
   defaultValues?: ProductFormValues;
   submitLabel?: string;
+  /** Only ever populated on the edit page — a brand-new product has no uploaded photos yet. */
+  productImages?: ProductImageRef[];
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
   const errors = state && !state.success ? state.errors : undefined;
@@ -80,6 +84,36 @@ export function ProductForm({
       if (metaTitleRef.current) metaTitleRef.current.value = result.copy.metaTitle;
       if (metaDescriptionRef.current) metaDescriptionRef.current.value = result.copy.metaDescription;
       setAiMessage("Generated — review and edit before saving.");
+    });
+  }
+
+  const [selectedImageUrl, setSelectedImageUrl] = useState(productImages[0]?.url ?? "");
+  const [isAnalyzingImage, startAnalyzingImage] = useTransition();
+  const [imageAnalysisMessage, setImageAnalysisMessage] = useState<string | null>(null);
+  const [imageFeedback, setImageFeedback] = useState<string | null>(null);
+
+  function handleAnalyzeImage() {
+    if (!selectedImageUrl) return;
+    setImageAnalysisMessage(null);
+    setImageFeedback(null);
+    const categorySelect = formRef.current?.elements.namedItem("categoryId") as HTMLSelectElement | null;
+    const categoryName = categorySelect?.selectedOptions[0]?.text ?? "";
+
+    startAnalyzingImage(async () => {
+      const result = await generateAdminProductImageAnalysis({
+        imageUrl: selectedImageUrl,
+        productName: nameRef.current?.value ?? "",
+        categoryName,
+      });
+      if (!result.success) {
+        setImageAnalysisMessage(result.message);
+        return;
+      }
+      if (shortDescriptionRef.current) shortDescriptionRef.current.value = result.result.shortDescription;
+      if (descriptionRef.current) descriptionRef.current.value = result.result.description;
+      if (materialsRef.current) materialsRef.current.value = result.result.suggestedMaterials;
+      setImageFeedback(result.result.imageFeedback);
+      setImageAnalysisMessage("Filled from the photo — review and edit before saving.");
     });
   }
 
@@ -142,6 +176,44 @@ export function ProductForm({
           </div>
           {aiMessage && <p className="mt-1 text-xs text-ink/70">{aiMessage}</p>}
         </div>
+
+        {productImages.length > 0 && (
+          <div className="space-y-2 rounded-sm border border-cream-200 bg-cream-50 p-3 sm:col-span-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-medium">Analyze a product photo</p>
+              <div className="flex items-center gap-2">
+                {productImages.length > 1 && (
+                  <select
+                    value={selectedImageUrl}
+                    onChange={(e) => setSelectedImageUrl(e.target.value)}
+                    className="rounded-sm border border-cream-300 bg-cream-50 px-2 py-1.5 text-xs text-ink"
+                  >
+                    {productImages.map((image, i) => (
+                      <option key={image.url} value={image.url}>
+                        Photo {i + 1}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <Button type="button" variant="secondary" loading={isAnalyzingImage} onClick={handleAnalyzeImage}>
+                  {isAnalyzingImage ? "Analyzing…" : "Analyze Photo & Fill"}
+                </Button>
+              </div>
+            </div>
+            <p className="text-xs text-ink/60">
+              Reads the selected photo and fills the short description, description, and materials
+              fields below from what&apos;s actually visible — plus honest feedback on the photo
+              itself.
+            </p>
+            {imageAnalysisMessage && <p className="text-xs text-ink/70">{imageAnalysisMessage}</p>}
+            {imageFeedback && (
+              <div className="rounded-sm bg-cream-100 p-2 text-xs text-ink/80">
+                <span className="font-medium text-ink">Photo feedback: </span>
+                {imageFeedback}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="space-y-1 sm:col-span-2">
           <label className="text-sm font-medium" htmlFor="shortDescription">

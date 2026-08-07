@@ -1,7 +1,7 @@
 "use server";
 
 import { requireRole } from "@/lib/dal";
-import { generateListingCopy, type ListingCopy } from "@/lib/ai";
+import { analyzeProductImage, generateListingCopy, type ListingCopy, type ProductImageAnalysis } from "@/lib/ai";
 import type { Prisma } from "@/generated/prisma/client";
 import {
   createAiActivityLog,
@@ -72,6 +72,17 @@ export async function generateProductListingCopy(input: {
     console.error("generateProductListingCopy failed:", error);
     return { success: false, message: "AI generation failed — please try again or write the copy manually." };
   }
+}
+
+export async function generateAdminProductImageAnalysis(input: {
+  userId?: string;
+  imageUrl: string;
+  productName?: string;
+  categoryName?: string;
+}): Promise<AiActionResult<ProductImageAnalysis>> {
+  return auditAndLog(input.userId, "Product Image Analysis", input.productName || input.imageUrl, input, () =>
+    analyzeProductImage({ imageUrl: input.imageUrl, productName: input.productName, categoryName: input.categoryName }),
+  );
 }
 
 export async function generateAdminSeoAudit(input: {
