@@ -497,3 +497,18 @@ model NewsletterSubscriber {
   email        String   @unique
   subscribedAt DateTime @default(now())
 }
+
+// The Contact page's actual delivery mechanism — every submission is
+// persisted here (not just emailed) so nothing gets lost if the outbound
+// email hiccups, and admin has a durable record independent of an inbox.
+model ContactMessage {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  orderNumber String?
+  message     String   @db.Text
+  isResolved  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([isResolved, createdAt])
+}

@@ -25,6 +25,7 @@ const RESERVED_SLUGS = new Set([
   "verify-email",
   "admin",
   "api",
+  "contact",
   "sitemap.xml",
   "robots.txt",
 ]);

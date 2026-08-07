@@ -17,8 +17,7 @@ export function CustomRequestForm({ products }: { products: Product[] }) {
       <div className="rounded-sm border border-cream-200 bg-cream-50 p-8 text-center">
         <p className="font-display text-2xl">Request received</p>
         <p className="mt-2 text-ink/70">
-          Thanks — we&apos;ll review your request and follow up by email, usually within 1–2
-          business days.
+          Thanks — we&apos;ll review your request and follow up by email.
         </p>
       </div>
     );
