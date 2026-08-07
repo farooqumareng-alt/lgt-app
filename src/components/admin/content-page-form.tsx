@@ -55,11 +55,15 @@ export function ContentPageForm({
           <label className="text-sm font-medium" htmlFor="content">
             Content
           </label>
-          <p className="text-xs text-ink/60">Plain text — leave a blank line between paragraphs.</p>
+          <p className="text-xs text-ink/60">
+            Plain text — leave a blank line between paragraphs. Start a paragraph with{" "}
+            <code>## </code> to render it as a section heading (for longer structured pages like
+            Terms or Privacy).
+          </p>
           <textarea
             id="content"
             name="content"
-            rows={14}
+            rows={22}
             defaultValue={defaultValues?.content ?? ""}
             required
             className="w-full rounded-sm border border-cream-300 bg-cream-50 px-3 py-2 text-sm text-ink focus-visible:border-saddle"

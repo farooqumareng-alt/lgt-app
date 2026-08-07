@@ -35,7 +35,8 @@ const TRUST_POINTS = [
 // so the homepage teaser can never drift out of sync with the full page an
 // admin edits at /admin/content.
 function firstParagraph(content: string): string {
-  const [first] = content.split(/\n\s*\n/).filter((p) => p.trim());
+  const blocks = content.split(/\n\s*\n/).filter((p) => p.trim());
+  const first = blocks.find((block) => !block.trim().startsWith("## "));
   return (first ?? "").trim();
 }
 
