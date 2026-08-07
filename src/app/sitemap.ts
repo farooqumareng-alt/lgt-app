@@ -11,12 +11,16 @@ export const dynamic = "force-dynamic";
 const SITE_URL = process.env.AUTH_URL ?? "http://localhost:3000";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [categories, products] = await Promise.all([
+  const [categories, products, contentPages, blogPosts] = await Promise.all([
     prisma.category.findMany({ select: { urlSlug: true } }),
     prisma.product.findMany({
       where: { isActive: true },
       select: { slug: true, category: { select: { urlSlug: true } }, updatedAt: true },
     }),
+    prisma.contentPage.findMany({ select: { slug: true, updatedAt: true } }).catch(() => []),
+    prisma.blogPost
+      .findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } })
+      .catch(() => []),
   ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -24,6 +28,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/shop`, changeFrequency: "daily", priority: 0.9 },
     { url: `${SITE_URL}/custom`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${SITE_URL}/custom/request`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/contact`, changeFrequency: "monthly", priority: 0.4 },
+    { url: `${SITE_URL}/blog`, changeFrequency: "weekly", priority: 0.6 },
   ];
 
   const categoryRoutes: MetadataRoute.Sitemap = categories.map((category) => ({
@@ -39,5 +45,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...categoryRoutes, ...productRoutes];
+  const contentPageRoutes: MetadataRoute.Sitemap = contentPages.map((page) => ({
+    url: `${SITE_URL}/${page.slug}`,
+    lastModified: page.updatedAt,
+    changeFrequency: "monthly",
+    priority: 0.4,
+  }));
+
+  const blogPostRoutes: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: `${SITE_URL}/blog/${post.slug}`,
+    lastModified: post.updatedAt,
+    changeFrequency: "monthly",
+    priority: 0.5,
+  }));
+
+  return [...staticRoutes, ...categoryRoutes, ...productRoutes, ...contentPageRoutes, ...blogPostRoutes];
 }

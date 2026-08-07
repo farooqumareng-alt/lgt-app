@@ -26,6 +26,7 @@ const RESERVED_SLUGS = new Set([
   "admin",
   "api",
   "contact",
+  "blog",
   "sitemap.xml",
   "robots.txt",
 ]);

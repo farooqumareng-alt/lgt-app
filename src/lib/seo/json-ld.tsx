@@ -32,6 +32,27 @@ export function breadcrumbListJsonLd(items: { label: string; href: string }[]) {
   };
 }
 
+export function blogPostingJsonLd(post: {
+  title: string;
+  excerpt?: string | null;
+  slug: string;
+  publishedAt: Date | null;
+  updatedAt: Date;
+  coverImageUrl?: string | null;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    ...(post.excerpt ? { description: post.excerpt } : {}),
+    ...(post.coverImageUrl ? { image: post.coverImageUrl } : {}),
+    ...(post.publishedAt ? { datePublished: post.publishedAt.toISOString() } : {}),
+    dateModified: post.updatedAt.toISOString(),
+    url: `${SITE_URL}/blog/${post.slug}`,
+    author: { "@type": "Organization", name: SITE_NAME },
+  };
+}
+
 export function productJsonLd(product: {
   name: string;
   description: string;

@@ -32,6 +32,9 @@ export default async function RetailLayout({ children }: { children: React.React
                 <Link href="/wholesale" className="text-ink/70 hover:text-saddle">
                   Wholesale Program
                 </Link>
+                <Link href="/blog" className="text-ink/70 hover:text-saddle">
+                  Blog
+                </Link>
               </nav>
             </div>
             {footerPages.length > 0 && (

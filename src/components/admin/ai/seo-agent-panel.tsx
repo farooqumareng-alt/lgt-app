@@ -5,7 +5,9 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { generateAdminSeoAudit, generateAdminBlogPost, generateAdminKeywordResearch } from "@/server/actions/admin-ai";
+import { createBlogPostDraftFromAi } from "@/server/actions/admin-blog";
 import type { AiSeoAuditResult, AiBlogPostResult, AiKeywordResearchResult } from "@/lib/admin-ai";
 
 function ResultBlock({ children }: { children: React.ReactNode }) {
@@ -159,6 +161,13 @@ export function SeoAgentPanel({ userId }: { userId?: string }) {
             <Field label="Conclusion" value={blogResult.conclusion} />
             <Field label="SEO Meta Title" value={blogResult.seoMetaTitle} />
             <Field label="SEO Meta Description" value={blogResult.seoMetaDescription} />
+            <form action={createBlogPostDraftFromAi.bind(null, blogTopic, blogResult)}>
+              <SubmitButton pendingLabel="Creating draft…">Create as Draft</SubmitButton>
+              <p className="mt-1 text-xs text-ink/50">
+                Saves this as an unpublished post under Admin → Blog for you to review, edit, and
+                publish — nothing goes live automatically.
+              </p>
+            </form>
           </ResultBlock>
         )}
       </Card>

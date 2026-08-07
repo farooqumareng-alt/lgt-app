@@ -4,6 +4,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { logout } from "@/server/actions/auth";
 import { Button } from "@/components/ui/button";
+import { MobileNav } from "@/components/retail/mobile-nav";
 import { getCart } from "@/server/repositories/cart";
 import { getWholesaleCartItemCount } from "@/server/repositories/wholesale-cart";
 
@@ -17,7 +18,7 @@ export async function SiteHeader({ channel = "RETAIL" }: { channel?: "RETAIL" | 
   ]);
 
   return (
-    <header className="border-b border-cream-200">
+    <header className="relative border-b border-cream-200">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         <Link href="/" className="flex items-center py-1">
           <Image
@@ -40,6 +41,9 @@ export async function SiteHeader({ channel = "RETAIL" }: { channel?: "RETAIL" | 
           <Link href="/wholesale" className="hover:text-saddle">
             Wholesale
           </Link>
+          <Link href="/blog" className="hover:text-saddle">
+            Blog
+          </Link>
           {session?.user?.role === "ADMIN" && (
             <Link href="/admin" className="hover:text-saddle">
               Admin
@@ -47,7 +51,7 @@ export async function SiteHeader({ channel = "RETAIL" }: { channel?: "RETAIL" | 
           )}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1 sm:gap-3">
           <Link href={cartHref} className="relative flex items-center p-2 hover:text-saddle" aria-label="Cart">
             <svg
               viewBox="0 0 24 24"
@@ -68,25 +72,30 @@ export async function SiteHeader({ channel = "RETAIL" }: { channel?: "RETAIL" | 
               </span>
             )}
           </Link>
-          {session?.user ? (
-            <form action={logout}>
-              <Button type="submit" variant="secondary">
-                Sign out
-              </Button>
-            </form>
-          ) : (
-            <>
-              <Link href="/login" className="text-sm font-medium hover:text-saddle">
-                Sign in
-              </Link>
-              <Link
-                href="/register"
-                className="rounded-sm bg-saddle px-4 py-2 text-sm font-medium text-cream-50 hover:bg-saddle-600"
-              >
-                Create Account
-              </Link>
-            </>
-          )}
+
+          <div className="hidden items-center gap-3 sm:flex">
+            {session?.user ? (
+              <form action={logout}>
+                <Button type="submit" variant="secondary">
+                  Sign out
+                </Button>
+              </form>
+            ) : (
+              <>
+                <Link href="/login" className="text-sm font-medium hover:text-saddle">
+                  Sign in
+                </Link>
+                <Link
+                  href="/register"
+                  className="rounded-sm bg-saddle px-4 py-2 text-sm font-medium text-cream-50 hover:bg-saddle-600"
+                >
+                  Create Account
+                </Link>
+              </>
+            )}
+          </div>
+
+          <MobileNav isAdmin={session?.user?.role === "ADMIN"} isLoggedIn={!!session?.user} logoutAction={logout} />
         </div>
       </div>
     </header>

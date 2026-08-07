@@ -16,6 +16,7 @@ const LINKS = [
   { href: "/admin/contact-messages", label: "Contact Messages" },
   { href: "/admin/reviews", label: "Reviews" },
   { href: "/admin/content", label: "Content" },
+  { href: "/admin/blog", label: "Blog" },
 ];
 
 export function AdminNav() {
