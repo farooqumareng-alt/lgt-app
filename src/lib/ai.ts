@@ -76,7 +76,11 @@ Look at this product photo${input.productName ? ` of "${input.productName}"` : "
   } and do two separate things:
 
 1. Write listing copy based on what you actually see in the photo — color, hardware, stitching,
-   texture, and any other visible details. Don't invent details you can't see.
+   texture, and any other visible details. Don't invent details you can't see. For materials: a
+   photo can tell you hardware finish/color and general leather texture, but NOT tannage or
+   authenticity (e.g. full-grain vs. genuine vs. bonded) — describe what's visually apparent
+   (color, hardware tone, grain texture) rather than asserting a specific leather grade unless the
+   product name given to you already states it.
 2. Give brief, honest feedback on the PHOTO ITSELF as an e-commerce product image — lighting,
    background, framing, and whether it looks professional enough for a live product page. If it
    already looks good, say so plainly rather than inventing a problem.

@@ -30,7 +30,7 @@ export function GenerateImageForm({ productId, name, categoryName, materials }: 
         setMessage(result.message);
         return;
       }
-      setMessage("Placeholder image added — swap it for real photography when available.");
+      setMessage("Draft photo added — swap it for real photography when available.");
       router.refresh();
     });
   }
@@ -38,7 +38,7 @@ export function GenerateImageForm({ productId, name, categoryName, materials }: 
   return (
     <div className="flex items-center gap-3">
       <Button type="button" variant="secondary" loading={isPending} onClick={handleGenerate}>
-        {isPending ? "Generating…" : "Generate Placeholder Photo (AI)"}
+        {isPending ? "Generating…" : "✨ Generate Draft Product Photo"}
       </Button>
       {message && <p className="text-xs text-ink/70">{message}</p>}
     </div>

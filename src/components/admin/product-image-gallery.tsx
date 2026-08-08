@@ -25,7 +25,7 @@ export function ProductImageGallery({ images }: { images: ProductImage[] }) {
             <Image src={image.url} alt={image.altText} fill className="object-cover" sizes="150px" />
             {image.isAiGenerated && (
               <Badge variant="solid" className="absolute left-1 top-1">
-                AI placeholder
+                AI draft
               </Badge>
             )}
           </div>

@@ -38,7 +38,7 @@ export async function generatePlaceholderProductImage(
       data: {
         productId,
         url: blob.url,
-        altText: `${input.name} — AI-generated placeholder photo, not the actual product`,
+        altText: `${input.name} — AI-generated draft photo, not the actual product`,
         isPrimary: existingCount === 0,
         sortOrder: existingCount,
         isAiGenerated: true,

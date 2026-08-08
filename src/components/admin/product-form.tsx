@@ -2,7 +2,6 @@
 
 import { useActionState, useRef, useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ProductAiPanel } from "@/components/admin/product-ai-panel";
@@ -333,11 +332,17 @@ export function ProductForm({
         </div>
 
         {state && !state.success && state.message && <p className="text-sm text-saddle-700">{state.message}</p>}
-
-        <Button type="submit" loading={pending}>
-          {pending ? "Saving…" : submitLabel}
-        </Button>
+        <p className="text-xs text-ink/50">
+          {pending ? "Saving…" : `Use "${submitLabel}" at the top of the page to save your changes.`}
+        </p>
       </Card>
+
+      {/* No submit button down here on purpose — the page's sticky header
+          holds the one Save control (via `form={formId}`, an external
+          submit button is a fully valid submit trigger for this form per
+          the HTML spec, including implicit Enter-key submission from any
+          text field above). A second button at the bottom just duplicated
+          it at every scroll position. */}
     </form>
   );
 }

@@ -96,21 +96,14 @@ export function ProductAiPanel({
   }
 
   return (
-    <div className="space-y-2 rounded-sm border border-cream-200 bg-cream-50 p-4">
+    <div className="space-y-2 rounded-sm border border-cream-200 bg-cream-50 p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <p className="text-sm font-medium">✨ Analyze Product &amp; Generate Listing</p>
-          <p className="text-xs text-ink/60">
-            {hasPhoto
-              ? "Reads the selected photo below and fills the description, materials, and SEO fields from what's actually visible."
-              : "No photo yet, so this drafts from the product name and category instead — add a real photo for a more accurate result."}
-          </p>
-        </div>
+        <p className="text-sm font-medium">✨ AI Product Assistant</p>
         {productImages.length > 1 && (
           <select
             value={selectedImageUrl}
             onChange={(e) => onSelectImage(e.target.value)}
-            className="rounded-sm border border-cream-300 bg-cream-50 px-2 py-1.5 text-xs text-ink"
+            className="rounded-sm border border-cream-300 bg-cream-50 px-2 py-1 text-xs text-ink"
           >
             {productImages.map((image, i) => (
               <option key={image.url} value={image.url}>
@@ -120,15 +113,25 @@ export function ProductAiPanel({
           </select>
         )}
       </div>
+      {/* Only show the explainer before first use — once there's a result,
+          the result line itself says what happened, and the explainer is
+          just extra vertical space at that point. */}
+      {!message && (
+        <p className="text-xs text-ink/60">
+          {hasPhoto
+            ? "Fills description, materials, and SEO from the selected photo."
+            : "No photo yet — drafts from the name and category instead. Add a photo for a more accurate result."}
+        </p>
+      )}
       <Button type="button" variant="secondary" loading={isPending} onClick={handleGenerate}>
         {isPending ? "Analyzing…" : "✨ Analyze Product & Generate Listing"}
       </Button>
       {message && <p className="text-xs text-ink/70">{message}</p>}
       {imageFeedback && (
-        <div className="rounded-sm bg-cream-100 p-2 text-xs text-ink/80">
-          <span className="font-medium text-ink">Photo feedback: </span>
-          {imageFeedback}
-        </div>
+        <details className="text-xs text-ink/80">
+          <summary className="cursor-pointer font-medium text-ink hover:text-saddle">Photo feedback</summary>
+          <p className="mt-1 rounded-sm bg-cream-100 p-2">{imageFeedback}</p>
+        </details>
       )}
     </div>
   );
