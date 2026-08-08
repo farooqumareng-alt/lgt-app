@@ -18,10 +18,11 @@ export default async function NewProductPage() {
     <div className="mx-auto max-w-3xl px-6 py-12">
       <h1 className="font-display text-3xl">New Product</h1>
       <p className="mt-1 text-sm text-ink/70">
-        Variants, price breaks, and images can be added after the initial save.
+        Attach photos below, or skip them — variants, price breaks, and any remaining images can be
+        added after the initial save.
       </p>
       <div className="mt-8">
-        <ProductForm action={createProduct} categories={categories} submitLabel="Create Product" />
+        <ProductForm action={createProduct} categories={categories} submitLabel="Create Product" isNew />
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { put } from "@vercel/blob";
 
 import { requireRole } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
@@ -38,6 +39,30 @@ function parseProductForm(formData: FormData) {
     metaTitle: formData.get("metaTitle"),
     metaDescription: formData.get("metaDescription"),
   });
+}
+
+// Lets the New Product form attach photos in the same submission instead of
+// requiring a second trip to the edit page — reduces a full-listing effort
+// from "create, then re-open, then upload" down to one step. Failures here
+// are non-fatal: the product row already exists by the time this runs, so a
+// single bad upload just means fewer photos land, not a failed product save.
+async function attachInitialProductImages(productId: string, productName: string, files: File[]) {
+  for (const [index, file] of files.entries()) {
+    try {
+      const blob = await put(`products/${productId}/${Date.now()}-${file.name}`, file, { access: "public" });
+      await prisma.productImage.create({
+        data: {
+          productId,
+          url: blob.url,
+          altText: files.length > 1 ? `${productName} — photo ${index + 1}` : productName,
+          sortOrder: index,
+          isPrimary: index === 0,
+        },
+      });
+    } catch (error) {
+      console.error(`attachInitialProductImages: failed to upload "${file.name}" for product ${productId}:`, error);
+    }
+  }
 }
 
 export async function createProduct(
@@ -79,6 +104,11 @@ export async function createProduct(
       metaDescription: parsed.data.metaDescription || null,
     },
   });
+
+  const imageFiles = formData.getAll("images").filter((entry): entry is File => entry instanceof File && entry.size > 0);
+  if (imageFiles.length > 0) {
+    await attachInitialProductImages(product.id, product.name, imageFiles);
+  }
 
   revalidatePath("/admin/products");
   redirect(`/admin/products/${product.id}/edit`);

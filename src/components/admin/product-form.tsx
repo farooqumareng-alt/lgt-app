@@ -40,6 +40,7 @@ export function ProductForm({
   defaultValues,
   submitLabel = "Save Product",
   productImages = [],
+  isNew = false,
 }: {
   action: ProductFormAction;
   categories: Category[];
@@ -47,6 +48,8 @@ export function ProductForm({
   submitLabel?: string;
   /** Only ever populated on the edit page — a brand-new product has no uploaded photos yet. */
   productImages?: ProductImageRef[];
+  /** New-product mode: shows an inline photo picker since there's no edit-page Images section to send admins to yet. */
+  isNew?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
   const errors = state && !state.success ? state.errors : undefined;
@@ -86,6 +89,8 @@ export function ProductForm({
       setAiMessage("Generated — review and edit before saving.");
     });
   }
+
+  const [selectedImageCount, setSelectedImageCount] = useState(0);
 
   const [selectedImageUrl, setSelectedImageUrl] = useState(productImages[0]?.url ?? "");
   const [isAnalyzingImage, startAnalyzingImage] = useTransition();
@@ -176,6 +181,30 @@ export function ProductForm({
           </div>
           {aiMessage && <p className="mt-1 text-xs text-ink/70">{aiMessage}</p>}
         </div>
+
+        {isNew && (
+          <div className="space-y-2 rounded-sm border border-cream-200 bg-cream-50 p-3 sm:col-span-2">
+            <p className="text-sm font-medium">Images (optional)</p>
+            <p className="text-xs text-ink/60">
+              Attach photos now instead of coming back after saving. Alt text is generated from the
+              product name — refine it anytime from the edit page&apos;s Images section.
+            </p>
+            <input
+              type="file"
+              name="images"
+              accept="image/*"
+              multiple
+              onChange={(e) => setSelectedImageCount(e.target.files?.length ?? 0)}
+              className="block text-sm"
+            />
+            {selectedImageCount > 0 && (
+              <p className="text-xs text-ink/70">
+                {selectedImageCount} image{selectedImageCount === 1 ? "" : "s"} selected — the first
+                becomes the primary photo.
+              </p>
+            )}
+          </div>
+        )}
 
         {productImages.length > 0 && (
           <div className="space-y-2 rounded-sm border border-cream-200 bg-cream-50 p-3 sm:col-span-2">
