@@ -51,12 +51,15 @@ export function ProductImageGallery({ images }: { images: ProductImage[] }) {
             <button
               type="button"
               disabled={isPending}
-              onClick={() =>
+              onClick={() => {
+                if (!window.confirm("Remove this photo? It will be permanently deleted from storage — this can't be undone.")) {
+                  return;
+                }
                 startTransition(async () => {
                   await deleteProductImage(image.id);
                   router.refresh();
-                })
-              }
+                });
+              }}
               className="text-ink/70 hover:text-saddle-700"
             >
               Remove

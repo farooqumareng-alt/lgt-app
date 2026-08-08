@@ -15,7 +15,7 @@ export default async function NewProductPage() {
   const categories = await getAllCategories();
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-[1200px] px-6 py-12">
       <h1 className="font-display text-3xl">New Product</h1>
       <p className="mt-1 text-sm text-ink/70">
         Attach photos below, or skip them — variants, price breaks, and any remaining images can be

@@ -55,6 +55,8 @@ export type ProductImageAnalysis = {
   shortDescription: string;
   description: string;
   suggestedMaterials: string;
+  metaTitle: string;
+  metaDescription: string;
   imageFeedback: string;
 };
 
@@ -84,6 +86,8 @@ Respond with ONLY a JSON object (no markdown fences, no other text) with exactly
   "shortDescription": "one sentence, under 150 characters, for product grid cards",
   "description": "2-3 sentences, the full product page description, based on what's visible",
   "suggestedMaterials": "comma-separated list of materials/hardware visible in the photo",
+  "metaTitle": "under 60 characters, SEO title tag",
+  "metaDescription": "under 155 characters, SEO meta description",
   "imageFeedback": "2-3 sentences of honest, actionable feedback on the photo's lighting, background, and framing"
 }`;
 
@@ -120,6 +124,8 @@ Respond with ONLY a JSON object (no markdown fences, no other text) with exactly
     typeof (parsed as ProductImageAnalysis).shortDescription !== "string" ||
     typeof (parsed as ProductImageAnalysis).description !== "string" ||
     typeof (parsed as ProductImageAnalysis).suggestedMaterials !== "string" ||
+    typeof (parsed as ProductImageAnalysis).metaTitle !== "string" ||
+    typeof (parsed as ProductImageAnalysis).metaDescription !== "string" ||
     typeof (parsed as ProductImageAnalysis).imageFeedback !== "string"
   ) {
     throw new Error("AI response was missing expected fields.");
