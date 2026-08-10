@@ -159,6 +159,10 @@ model VerificationToken {
   // each user's token is only ever looked up by (identifier, token) together.
   token      String
   expires    DateTime
+  // Wrong guesses against this token, counted regardless of which code was
+  // guessed — see verifyOtpCode in src/lib/otp.ts. Bounds brute-forcing the
+  // 6-digit space; the row is invalidated outright once the limit is hit.
+  attempts   Int      @default(0)
 
   @@unique([identifier, token])
 }

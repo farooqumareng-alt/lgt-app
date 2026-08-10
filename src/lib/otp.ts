@@ -1,10 +1,14 @@
 import "server-only";
-import { randomInt, createHash } from "node:crypto";
+import { randomInt, createHash, timingSafeEqual } from "node:crypto";
 
 import { prisma } from "@/lib/prisma";
 
 const OTP_TTL_MS = 10 * 60 * 1000; // 10 minutes
 const RESEND_COOLDOWN_MS = 60 * 1000; // 60 seconds
+// Bounds brute-forcing the 6-digit code space (1M possibilities) within the
+// TTL window. Once hit, the token is invalidated outright rather than left
+// guessable — the user has to request a fresh one, same as on expiry.
+const MAX_VERIFY_ATTEMPTS = 5;
 
 function hashOtpCode(code: string): string {
   return createHash("sha256").update(code).digest("hex");
@@ -35,16 +39,46 @@ export async function createVerificationToken(email: string): Promise<string> {
   return code;
 }
 
-/** Single-use — the matching token is deleted whether verification succeeds or not. */
+/**
+ * Single-use — the matching token is deleted on a correct guess, on expiry,
+ * or once MAX_VERIFY_ATTEMPTS wrong guesses have been made, whichever comes
+ * first. Looked up by identifier alone (not the old {identifier, token}
+ * compound lookup) so every guess — right or wrong — hits the same row and
+ * counts toward the limit; a wrong-code lookup on the compound key would
+ * simply miss the index and never touch (or rate-limit) anything.
+ */
 export async function verifyOtpCode(email: string, code: string): Promise<boolean> {
-  const hashed = hashOtpCode(code);
-  const token = await prisma.verificationToken.findUnique({
-    where: { identifier_token: { identifier: email, token: hashed } },
+  // createVerificationToken always clears prior rows first, so normally at
+  // most one token exists per identifier — but there's no DB constraint
+  // enforcing that, so two overlapping resend requests (double-click, two
+  // tabs) can each pass the delete-then-create race and leave two live
+  // rows. Preferring the newest keeps behavior predictable in that case:
+  // the code from the most recent email is the one that verifies.
+  const token = await prisma.verificationToken.findFirst({
+    where: { identifier: email },
+    orderBy: { expires: "desc" },
   });
   if (!token) return false;
 
+  // Both sides are fixed-length sha256 hex digests, so this is safe without
+  // extra length padding — guards the comparison itself against timing attacks.
+  const matches = timingSafeEqual(Buffer.from(hashOtpCode(code)), Buffer.from(token.token));
+
+  if (!matches) {
+    const attempts = token.attempts + 1;
+    if (attempts >= MAX_VERIFY_ATTEMPTS) {
+      await prisma.verificationToken.deleteMany({ where: { identifier: email } });
+    } else {
+      await prisma.verificationToken.update({
+        where: { identifier_token: { identifier: email, token: token.token } },
+        data: { attempts },
+      });
+    }
+    return false;
+  }
+
   await prisma.verificationToken.delete({
-    where: { identifier_token: { identifier: email, token: hashed } },
+    where: { identifier_token: { identifier: email, token: token.token } },
   });
 
   return token.expires > new Date();

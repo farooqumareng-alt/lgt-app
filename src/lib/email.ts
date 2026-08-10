@@ -39,7 +39,7 @@ export async function sendContactFormNotification(input: {
     throw new Error("CONTACT_FORM_RECIPIENT is not set");
   }
 
-  await getClient().emails.send({
+  const { error } = await getClient().emails.send({
     from: FROM_EMAIL,
     to: CONTACT_FORM_RECIPIENT,
     replyTo: input.email,
@@ -54,10 +54,17 @@ export async function sendContactFormNotification(input: {
       </div>
     `,
   });
+  // The SDK never rejects on an API-level failure (bad recipient, suspended
+  // account, etc.) — it resolves with { data: null, error }. Surfacing that
+  // as a thrown error is what lets callers' try/catch (and ours upstream)
+  // actually notice a send failed, instead of silently treating it as sent.
+  if (error) {
+    throw new Error(`Resend API error: ${error.message}`);
+  }
 }
 
 export async function sendVerificationEmail(to: string, code: string) {
-  await getClient().emails.send({
+  const { error } = await getClient().emails.send({
     from: FROM_EMAIL,
     to,
     subject: `${code} is your Leather Goods Texas verification code`,
@@ -77,4 +84,11 @@ export async function sendVerificationEmail(to: string, code: string) {
       </div>
     `,
   });
+  // See sendContactFormNotification above — the SDK resolves (never rejects)
+  // on API-level failures, so this is what makes register()'s and
+  // resendVerificationCode()'s existing try/catch around this call actually
+  // fire instead of silently reporting success for a code that never sent.
+  if (error) {
+    throw new Error(`Resend API error: ${error.message}`);
+  }
 }
