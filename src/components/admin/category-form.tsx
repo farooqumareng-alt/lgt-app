@@ -45,9 +45,19 @@ export function CategoryForm({
 
         <div className="space-y-1">
           <label className="text-sm font-medium" htmlFor="urlSlug">
-            URL slug (becomes /shop/slug)
+            URL slug
           </label>
-          <Input id="urlSlug" name="urlSlug" defaultValue={defaultValues?.urlSlug ?? ""} required />
+          <Input
+            id="urlSlug"
+            name="urlSlug"
+            placeholder="laptop-bags"
+            defaultValue={defaultValues?.urlSlug ?? ""}
+            required
+          />
+          <p className="text-xs text-ink/60">
+            Just the last part — lowercase letters, numbers, and hyphens only, e.g. <code>laptop-bags</code>, not the
+            full path. The page will be at /shop/{"{this value}"}.
+          </p>
           {errors?.urlSlug && <p className="text-sm text-saddle-700">{errors.urlSlug[0]}</p>}
         </div>
 
