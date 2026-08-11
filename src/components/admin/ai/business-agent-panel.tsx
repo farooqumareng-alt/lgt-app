@@ -2,11 +2,18 @@
 
 import { useState, useTransition } from "react";
 
+import { LowStockChart } from "@/components/admin/charts/low-stock-chart";
+import { RevenueByChannelChart } from "@/components/admin/charts/revenue-by-channel-chart";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { generateAdminBusinessReport, generateAdminAnalyticsSummary } from "@/server/actions/admin-ai";
 import type { AiBusinessReportResult, AiAnalyticsSummaryResult } from "@/lib/admin-ai";
+
+export type ChartStats = {
+  revenueByChannel: { retail: number; wholesale: number };
+  lowStockProducts: { name: string; totalStock: number }[];
+};
 
 function ResultBlock({ children }: { children: React.ReactNode }) {
   return <div className="mt-4 space-y-3 rounded-sm bg-cream-50 p-4 text-sm text-ink/80">{children}</div>;
@@ -21,7 +28,15 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function BusinessAgentPanel({ userId, businessDataSummary }: { userId?: string; businessDataSummary: string }) {
+export function BusinessAgentPanel({
+  userId,
+  businessDataSummary,
+  chartStats,
+}: {
+  userId?: string;
+  businessDataSummary: string;
+  chartStats: ChartStats;
+}) {
   const [focus, setFocus] = useState("");
   const [reportResult, setReportResult] = useState<AiBusinessReportResult | null>(null);
   const [reportPending, startReport] = useTransition();
@@ -60,15 +75,31 @@ export function BusinessAgentPanel({ userId, businessDataSummary }: { userId?: s
       <Card className="space-y-3 p-6">
         <h2 className="text-lg font-medium">Analytics</h2>
         <p className="text-sm text-ink/70">
-          Reads your actual current dashboard numbers (today&apos;s orders/revenue, low stock, pending wholesale,
-          this month&apos;s revenue split) and summarizes what they mean — not a demo.
+          Your actual current numbers, charted directly from the database — the AI never generates these figures,
+          only comments on what they mean.
         </p>
+
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-ink/70">Revenue by channel — this month</p>
+          <RevenueByChannelChart
+            retail={chartStats.revenueByChannel.retail}
+            wholesale={chartStats.revenueByChannel.wholesale}
+          />
+        </div>
+
+        {chartStats.lowStockProducts.length > 0 && (
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-ink/70">Low stock</p>
+            <LowStockChart items={chartStats.lowStockProducts} />
+          </div>
+        )}
+
         <details className="rounded-sm border border-cream-200 p-3 text-xs text-ink/70">
-          <summary className="cursor-pointer font-medium text-ink">View the data snapshot being analyzed</summary>
+          <summary className="cursor-pointer font-medium text-ink">View the full data snapshot sent to the AI</summary>
           <pre className="mt-2 whitespace-pre-wrap">{businessDataSummary}</pre>
         </details>
         <Button type="button" variant="secondary" loading={analyticsPending} onClick={runAnalytics}>
-          {analyticsPending ? "Analyzing…" : "Run Analytics"}
+          {analyticsPending ? "Analyzing…" : "Get AI Commentary"}
         </Button>
         {analyticsError && <p className="text-sm text-saddle-700">{analyticsError}</p>}
         {analyticsResult && (

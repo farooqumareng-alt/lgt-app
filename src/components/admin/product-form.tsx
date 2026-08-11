@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useRef, useState } from "react";
 
 import { Card } from "@/components/ui/card";
@@ -130,9 +131,19 @@ export function ProductForm({
           </div>
 
           <div className="space-y-1 sm:col-span-2">
-            <label className="text-sm font-medium" htmlFor="categoryId">
-              Category
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium" htmlFor="categoryId">
+                Category
+              </label>
+              <Link
+                href="/admin/categories/new"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-medium text-saddle hover:underline"
+              >
+                + New category
+              </Link>
+            </div>
             <select
               id="categoryId"
               name="categoryId"
@@ -149,6 +160,10 @@ export function ProductForm({
                 </option>
               ))}
             </select>
+            <p className="text-xs text-ink/60">
+              Opens in a new tab so your work here isn&apos;t lost — refresh this page after creating one to see it
+              in the list above.
+            </p>
             {errors?.categoryId && <p className="text-sm text-saddle-700">{errors.categoryId[0]}</p>}
           </div>
         </div>

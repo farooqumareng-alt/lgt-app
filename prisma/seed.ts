@@ -1,6 +1,5 @@
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import type { ProductCategorySlug } from "../src/generated/prisma/enums";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
@@ -21,7 +20,6 @@ type SeedProduct = {
 };
 
 type SeedCategory = {
-  slug: ProductCategorySlug;
   urlSlug: string;
   name: string;
   description: string;
@@ -40,7 +38,6 @@ const beltVariants: SeedVariant[] = [
 
 const CATEGORIES: SeedCategory[] = [
   {
-    slug: "BELTS",
     urlSlug: "belts",
     name: "Belts",
     description: "Full-grain leather belts built to break in, not break down.",
@@ -84,7 +81,6 @@ const CATEGORIES: SeedCategory[] = [
     ],
   },
   {
-    slug: "WALLETS",
     urlSlug: "wallets",
     name: "Wallets",
     description: "Slim, durable wallets in full-grain and vegetable-tanned leather.",
@@ -140,7 +136,6 @@ const CATEGORIES: SeedCategory[] = [
     ],
   },
   {
-    slug: "KEYCHAINS",
     urlSlug: "keychains",
     name: "Keychains",
     description: "Small leather goods that make a good gift.",
@@ -195,7 +190,6 @@ const CATEGORIES: SeedCategory[] = [
     ],
   },
   {
-    slug: "PURSES",
     urlSlug: "purses",
     name: "Purses",
     description: "Structured and everyday purses in full-grain leather.",
@@ -250,7 +244,6 @@ const CATEGORIES: SeedCategory[] = [
     ],
   },
   {
-    slug: "HANDBAGS",
     urlSlug: "handbags",
     name: "Handbags",
     description: "Totes and top-handle handbags for everyday carry.",
@@ -311,13 +304,11 @@ async function seedCatalog() {
     const category = await prisma.category.upsert({
       where: { urlSlug: categoryData.urlSlug },
       update: {
-        slug: categoryData.slug,
         name: categoryData.name,
         description: categoryData.description,
         sortOrder: categoryData.sortOrder,
       },
       create: {
-        slug: categoryData.slug,
         urlSlug: categoryData.urlSlug,
         name: categoryData.name,
         description: categoryData.description,

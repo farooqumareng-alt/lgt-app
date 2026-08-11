@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { DeveloperAgentPanel } from "@/components/admin/ai/developer-agent-panel";
 import { SeoAgentPanel } from "@/components/admin/ai/seo-agent-panel";
 import { ContentAgentPanel } from "@/components/admin/ai/content-agent-panel";
-import { BusinessAgentPanel } from "@/components/admin/ai/business-agent-panel";
+import { BusinessAgentPanel, type ChartStats } from "@/components/admin/ai/business-agent-panel";
 import { SecurityAgentPanel } from "@/components/admin/ai/security-agent-panel";
 import { ResultErrorBoundary } from "@/components/admin/ai/result-error-boundary";
 
@@ -23,6 +23,7 @@ type TabId = (typeof TABS)[number]["id"];
 type AiTabsProps = {
   userId?: string;
   businessDataSummary: string;
+  chartStats: ChartStats;
   recentLogs: Array<{
     id: string;
     type: string;
@@ -32,7 +33,7 @@ type AiTabsProps = {
   }>;
 };
 
-export function AiTabs({ userId, businessDataSummary, recentLogs }: AiTabsProps) {
+export function AiTabs({ userId, businessDataSummary, chartStats, recentLogs }: AiTabsProps) {
   const [active, setActive] = useState<TabId>("seo");
 
   return (
@@ -58,7 +59,9 @@ export function AiTabs({ userId, businessDataSummary, recentLogs }: AiTabsProps)
           {active === "developer" && <DeveloperAgentPanel userId={userId} />}
           {active === "seo" && <SeoAgentPanel userId={userId} />}
           {active === "content" && <ContentAgentPanel userId={userId} />}
-          {active === "business" && <BusinessAgentPanel userId={userId} businessDataSummary={businessDataSummary} />}
+          {active === "business" && (
+            <BusinessAgentPanel userId={userId} businessDataSummary={businessDataSummary} chartStats={chartStats} />
+          )}
           {active === "security" && <SecurityAgentPanel userId={userId} recentLogs={recentLogs} />}
         </ResultErrorBoundary>
       </div>

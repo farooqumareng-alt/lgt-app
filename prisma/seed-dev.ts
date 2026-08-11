@@ -16,12 +16,17 @@ async function main() {
 
   await prisma.user.upsert({
     where: { email: "admin@lgt.test" },
-    update: {},
+    // Re-running must also patch existing rows created before this field
+    // existed here — authorize() in src/lib/auth.ts refuses to sign in any
+    // user without emailVerified set, and this fixture has no real inbox to
+    // verify through, so it has to be pre-verified at seed time.
+    update: { emailVerified: new Date() },
     create: {
       name: "LGT Admin",
       email: "admin@lgt.test",
       passwordHash: adminPasswordHash,
       role: "ADMIN",
+      emailVerified: new Date(),
     },
   });
 

@@ -169,23 +169,20 @@ model VerificationToken {
 
 // ── Catalog ───────────────────────────────────────────
 
-enum ProductCategorySlug {
-  BELTS
-  WALLETS
-  KEYCHAINS
-  PURSES
-  HANDBAGS
-}
-
+// Admin-manageable — created/edited under /admin/categories. `urlSlug` is the
+// only identifier anything reads: it's what storefront routing keys off
+// (/shop/[urlSlug]) and what the product form's category picker stores via
+// categoryId. There used to also be a `slug` field backed by a fixed 5-value
+// enum, but nothing outside prisma/seed.ts ever read it — removed rather than
+// carried forward as dead weight (see migration 20260810120000).
 model Category {
-  id              String              @id @default(cuid())
-  slug            ProductCategorySlug @unique
-  urlSlug         String              @unique
+  id              String   @id @default(cuid())
+  urlSlug         String   @unique
   name            String
-  description     String?             @db.Text
+  description     String?  @db.Text
   metaTitle       String?
   metaDescription String?
-  sortOrder       Int                 @default(0)
+  sortOrder       Int      @default(0)
 
   products Product[]
 }

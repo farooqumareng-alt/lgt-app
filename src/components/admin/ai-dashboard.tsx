@@ -1,8 +1,10 @@
 import { AiTabs } from "@/components/admin/ai/ai-tabs";
+import type { ChartStats } from "@/components/admin/ai/business-agent-panel";
 
 type AiDashboardProps = {
   userId?: string;
   businessDataSummary: string;
+  chartStats: ChartStats;
   recentLogs: Array<{
     id: string;
     type: string;
@@ -12,7 +14,7 @@ type AiDashboardProps = {
   }>;
 };
 
-export function AiDashboard({ userId, businessDataSummary, recentLogs }: AiDashboardProps) {
+export function AiDashboard({ userId, businessDataSummary, chartStats, recentLogs }: AiDashboardProps) {
   return (
     <div className="space-y-6">
       <div>
@@ -22,7 +24,7 @@ export function AiDashboard({ userId, businessDataSummary, recentLogs }: AiDashb
           for review.
         </p>
       </div>
-      <AiTabs userId={userId} businessDataSummary={businessDataSummary} recentLogs={recentLogs} />
+      <AiTabs userId={userId} businessDataSummary={businessDataSummary} chartStats={chartStats} recentLogs={recentLogs} />
     </div>
   );
 }

@@ -45,6 +45,16 @@ export default async function AdminAiPage() {
 
   const stats = await getAdminDashboardStats();
   const businessDataSummary = buildBusinessDataSummary(stats);
+  // Plain, serializable numbers only — feeds the real chart in the Business
+  // Agent panel directly, independent of anything the AI returns (see
+  // RevenueByChannelChart/LowStockChart usage in business-agent-panel.tsx).
+  const chartStats = {
+    revenueByChannel: {
+      retail: stats.retailRevenueThisMonth,
+      wholesale: stats.wholesaleRevenueThisMonth,
+    },
+    lowStockProducts: stats.lowStockProducts.slice(0, 6),
+  };
 
   const serializedLogs = recentLogs.map((log) => ({
     ...log,
@@ -56,6 +66,7 @@ export default async function AdminAiPage() {
       <AiDashboard
         userId={session?.user?.id ?? undefined}
         businessDataSummary={businessDataSummary}
+        chartStats={chartStats}
         recentLogs={serializedLogs}
       />
     </main>

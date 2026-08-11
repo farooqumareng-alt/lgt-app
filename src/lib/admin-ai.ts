@@ -289,11 +289,16 @@ Return only JSON with keys: caption (the post text), hashtags (space-separated h
 export async function generateAnalyticsSummary(input: {
   dataSummary: string;
 }): Promise<AiAnalyticsSummaryResult> {
+  // The admin already sees these exact figures as real charts rendered
+  // directly from the database, next to this text (see business-agent-panel.tsx)
+  // — so this prompt is scoped to qualitative interpretation, not restating
+  // numbers. Keeps the model from ever being the source of a number an admin
+  // could act on; it only ever comments on numbers the UI already shows.
   const prompt = `You are a business intelligence analyst reviewing real, current data for a leather goods e-commerce business.
 Here is the actual current business data snapshot:
 ${input.dataSummary}
 
-Analyze this real data (not a hypothetical) and return only JSON with keys: insights (what the numbers show right now), trends (patterns worth watching), recommendations (specific, actionable next steps based on this exact data).`;
+The admin viewing your response can already see these exact numbers as charts — do not restate figures or repeat the raw data back. Analyze this real data (not a hypothetical) and return only JSON with keys: insights (what's notable about these numbers that isn't obvious from a glance at the chart), trends (patterns worth watching over time, not visible in a single snapshot), recommendations (specific, actionable next steps based on this exact data). Keep each field to 2-3 sentences of interpretation, not a numbers recap.`;
 
   return parseJson<AiAnalyticsSummaryResult>(await callAnthropic(prompt));
 }
